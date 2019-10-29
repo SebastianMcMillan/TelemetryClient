@@ -1,0 +1,15 @@
+#data {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+fieldset {
+	font-family: sans-serif;
+	display: inline-block;
+	width: 20em;
+	border-radius: 6px;
+	padding-left: 1em;
+}
+legend {
+	font-size: 14pt;
+}
