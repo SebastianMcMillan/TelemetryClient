@@ -22,7 +22,7 @@ def index():
 			"Timestamp": ["", "2019-10-28 18:41:37"],
 			"Speed": [" mph", 38.7],
 			"Location": ["", '38.9600781,-95.2468986'], #<a href="https://www.google.com/maps/@38.9600781,-95.2468986,14z" target="_blank">
-			"Altitiude": [" ft", 865],
+			"Altitude": [" ft", 865],
 			"Number of satellites": ["", 5],
 		},
 	}
