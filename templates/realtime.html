@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>KU Solar Car Telemetry</title>
+		<link rel="stylesheet" type="text/css" href="static/style.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body>
+		<div id="data">
+		{% for source, sensors in data.items() %}
+		<fieldset>
+			<legend>{{source}}</legend>
+			{% for sensor, properties in sensors.items() %}
+				{{sensor}}: {{properties[1]}}{{properties[0]}}<br>
+			{% endfor %}
+		</fieldset>
+		{% endfor %}
+		</div>
+	</body>
+</html>

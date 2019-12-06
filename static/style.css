@@ -1,0 +1,29 @@
+* { box-sizing: border-box; }
+body {
+	text-align: center;
+}
+#bg {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: -100;
+	opacity: 0.2;
+	background: url(/static/images/background.jpg) center/cover no-repeat;
+}
+#data {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+fieldset {
+	font-family: sans-serif;
+	display: inline-block;
+	width: 20em;
+	border-radius: 6px;
+	padding-left: 1em;
+}
+legend {
+	font-size: 14pt;
+}
