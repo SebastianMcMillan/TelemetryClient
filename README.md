@@ -1,2 +1,2 @@
 # TelemetryClient
-Client to receive and display telemetry data
+Pit-side client software to receive and display telemetry data from the car
