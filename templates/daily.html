@@ -5,8 +5,8 @@
 		<title>KU Solar Car Telemetry</title>
 		<link rel="stylesheet" type="text/css" href="static/style.css">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<script src="static/Chart.js"></script>
 		<script src="static/Moment.js"></script>
+		<script src="static/Chart.js"></script>
 		<style type="text/css">
 			html, body { height: 100%; }
 			body {
@@ -60,7 +60,7 @@
 			}
 		</style>
 		<script type="text/javascript">
-			const TABS = [{% for graph, data in graphs.items() %}'{{graph}}', {% endfor %}];
+			const TABS = [{% for graph, data in graph_data.items() %}'{{graph}}', {% endfor %}];
 			function setTab(tab) {
 				for (var i = 0; i < TABS.length; i++) {
 					var isActiveTab = (TABS[i] == tab);
@@ -78,12 +78,12 @@
 			<form><button type="submit" name="date" value="{{next_date_str}}">&#9658;</button></form>
 		</div>
 		<div id="tabs">
-			{% for graph, data in graphs.items() %}
+			{% for graph, data in graph_data.items() %}
 				<span class="tab" id="tab-{{graph}}" onclick="setTab('{{graph}}')">{{graph}}</span>
 			{% endfor %}
 		</div>
 		<div id="graph-container">
-			{% for graph, data in graphs.items() %}
+			{% for graph, data in graph_data.items() %}
 				<div class="graph" id="{{graph}}"> 
 					<!-- ¯\_(ツ)_/¯ -->
 					<canvas id="chart-{{graph}}"></canvas>
@@ -92,14 +92,14 @@
 							type: "scatter",
 							data: {
 								datasets: [
-									{% for label, tmp in data[0].items() %}
+									{% for label in graph_labels[graph] %}
 										{
 											label: "{{label}}",
-											data: {
-												{% for entry in data %}
-													{x: {{entry.time}}, y: {{entry[label]}}},
+											data: [
+												{% for time, entry in data.items() %}
+													{x: {{time}}, y: {{entry[label]}}},
 												{% endfor %}
-											}
+											], fill: false, borderColor: "red", borderWidth: 2.5, showLine: true
 										},
 									{% endfor %}
 								]

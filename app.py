@@ -7,13 +7,10 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 
-# Use the application default credentials
-#cred = credentials.ApplicationDefault()
-cred = credentials.Certificate("ku-solar-car-b87af-firebase-adminsdk-ttwuy-0945c0ac44.json")
-firebase_admin.initialize_app(cred, {
-  "projectId": "ku-solar-car-b87af",
-})
+from collections import OrderedDict
 
+cred = credentials.Certificate("ku-solar-car-b87af-firebase-adminsdk-ttwuy-0945c0ac44.json")
+firebase_admin.initialize_app(cred, {"projectId": "ku-solar-car-b87af"})
 db = firestore.client()
 
 app = Flask(__name__)
@@ -48,7 +45,7 @@ def realtime():
 	
 	return render_template('realtime.html', data=data)
 	
-# TODO: Endpoint for AJAX requests to update above data
+# TODO: Endpoint for AJAX requests to update above data on realtime page
 	
 @app.route('/daily', methods=['GET'])
 def daily():
@@ -66,27 +63,42 @@ def daily():
 	
 	TABS = ["battery", "motor", "solar", "speed"]
 	
-	graphs = {}
+	graph_data = {} # The data from the database that will be plotted on each graph
+	graph_labels = {} # The keys for each of the types of data per graph
+	
 	for tab in TABS:
-		graphs[tab] = []
-		tab_data = db.collection(tab).stream()
+		graph_data[tab] = OrderedDict()
+		init_labels = False
+		
+		tab_data = db.collection(tab).order_by("time").stream()
 		for entry in tab_data:
-			print('{} => {}'.format(entry.id, entry.to_dict()))
-			graphs[tab].append(entry.to_dict()) 
-			# TODO: Switch to below so keys are timestamps, change [] to {} above, remove time from entry.to_dict() below
-			# Need database to have time entry for all data to do this
-			# graphs[tab][to_milliseconds(entry.time)] = entry.to_dict()
+			dict = entry.to_dict()
+			print('{} => {}'.format(entry.id, dict))
+			
+			# Create graph_labels (each piece of data that will be a line on the graph)
+			if init_labels == False:
+				graph_labels[tab] = dict.keys()
+				init_labels = True
+			
+			# Skip entries without time (should not exist)
+			if not "time" in dict: continue
+			
+			# Convert time format from database to UNIX timestamp, then remove from dict
+			timestamp = int(dict["time"].timestamp())*1000
+			del dict["time"]
+			
+			dict.pop('location', None) # TEMPORARY
+			
+			graph_data[tab][timestamp] = dict
+			
+		for k,v in graph_data[tab].items():
+			print("TEST: " + str(k))
 	
-	"""graphs = {
-		"Battery": {},
-		"Solar": {},
-		"Motor": {},
-		"Speed": {},
-		"Temps": {},
-		"Location": {} # TODO: Handle location separately (Google maps)
-	}"""
+	print("GRAPH LABELS: " + str(graph_labels))
 	
-	return render_template('daily.html', graphs=graphs, date_str=date_str, prev_date_str=prev_date_str, next_date_str=next_date_str)
+	# list(data.keys()).sort()
+	
+	return render_template('daily.html', **locals())
 	
 @app.route('/longterm', methods=['GET'])
 def longterm():
