@@ -29,7 +29,7 @@ def realtime():
 	return "NYI"
 	#return render_template('realtime.html', data=data)
 	
-# TODO: Endpoint for AJAX requests to update above data on realtime page
+# TODO: Endpoint for AJAX requests to update data on realtime page
 	
 @app.route('/daily', methods=['GET'])
 def daily():
@@ -49,7 +49,7 @@ def daily():
 	
 	# Determines what each tab/graph should display
 	with open(CLIENT_FORMAT_FILE) as file_handle:
-		tab_format = json.load(file_handle)
+		client_format = json.load(file_handle)
 	
 	# Specifies information about each sensor in the database
 	with open(DATABASE_FORMAT_FILE) as file_handle:
@@ -64,10 +64,10 @@ def daily():
 		readings = OrderedDict(sorted(readings.items())) # Sort the map
 		print("readings: " + str(readings))
 	except StopIteration:
-		readings = [] # No document for day requested
+		readings = {} # No document for day requested
 	
 	
-	graph_data = OrderedDict() # The data rearranged for usage in the render template
+	graph_data = OrderedDict() # The data rearranged for usage in the render template (see format below)
 	""" graph_data {
 			"Battery": {
 				"Voltage": {"1579970374000": 423, "1579970379000": 419, ...},
@@ -79,13 +79,13 @@ def daily():
 	
 	# Tabs array represents each different graph tab the user can look at
 	tabs = []
-	for tab in tab_format:
+	for tab, tab_data in client_format.items():
 		tabs.append(tab)
 		graph_data[tab] = OrderedDict()
 		print("===== TAB: " + tab + " =====")
 		
 		# Loop through every sensor the current tab should show a reading for
-		for sensor_id in tab_format[tab]["lines"]:
+		for sensor_id in tab_data["lines"]:
 		
 			# Find the info about the sensor
 			sensor = next((item for item in db_format if item["id"] == sensor_id), None)
@@ -94,12 +94,8 @@ def daily():
 				graph_data[tab][sensor["name"]] = OrderedDict()
 				print("-- " + str(sensor["index"]) + ": " + sensor_id + " --")
 				
-				
 				# Loop through all the sensor readings for the day being viewed
-				for time, reading in readings.items():
-					# reading = second of current day
-					# readings[reading][sensor["index"]] = the value of the sensor at that second
-					
+				for time, reading in readings.items():					
 					unix = int(date.timestamp() + int(time))*1000 # TODO: Timezone incorrect
 					graph_data[tab][sensor["name"]][unix] = reading[sensor["index"]]
 					print(str(unix) + ": " + str(reading[sensor["index"]]))
