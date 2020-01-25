@@ -92,12 +92,12 @@
 							type: "scatter",
 							data: {
 								datasets: [
-									{% for label in graph_labels[graph] %}
+									{% for sensor, entries in data.items() %}
 										{
-											label: "{{label}}",
+											label: "{{sensor}}",
 											data: [
-												{% for time, entry in data.items() %}
-													{x: {{time}}, y: {{entry[label]}}},
+												{% for time, entry in entries.items() %}
+													{x: {{time}}, y: {{entry}}},
 												{% endfor %}
 											], fill: false, borderColor: "red", borderWidth: 2.5, showLine: true
 										},

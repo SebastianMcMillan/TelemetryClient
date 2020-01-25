@@ -1,0 +1,20 @@
+{
+	"Battery": {
+		"lines": ["battery_voltage", "battery_current", "battery_level", "bms_fault"]
+	},
+	"Solar": {
+		"lines": ["solar_voltage"]
+	},
+	"Location": {
+		"lines": ["gps_lat", "gps_lon"]
+	},
+	"Speed": {
+		"lines": ["hall_speed", "gps_speed"]
+	},
+	"Temperatures": {
+		"lines": ["battery_temperature", "motor_temperature"]
+	},
+	"Motor": {
+		"lines": ["motor_power"]
+	}
+}
