@@ -5,8 +5,8 @@
 		<title>KU Solar Car Telemetry</title>
 		<link rel="stylesheet" type="text/css" href="static/style.css">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<script src="static/Chart.js"></script>
 		<script src="static/Moment.js"></script>
+		<script src="static/Chart.js"></script>
 		<style type="text/css">
 			html, body { height: 100%; }
 			body {
@@ -60,13 +60,25 @@
 			}
 		</style>
 		<script type="text/javascript">
-			const TABS = [{% for graph, data in graphs.items() %}'{{graph}}', {% endfor %}];
+			const TABS = [{% for graph, data in graph_data.items() %}'{{graph}}', {% endfor %}];
 			function setTab(tab) {
 				for (var i = 0; i < TABS.length; i++) {
 					var isActiveTab = (TABS[i] == tab);
 					document.getElementById("tab-"+TABS[i]).classList.toggle("active", isActiveTab);
 					document.getElementById(TABS[i]).style.display = isActiveTab ? "block" : "none";
 				}
+			}
+			
+			// Seeded random color for string - in the future there should be colors in client_format.json
+			// https://gist.github.com/0x263b/2bdd90886c2036a1ad5bcf06d6e6fb37
+			String.prototype.toHue = function() {
+				var hash = 0;
+				if (this.length === 0) return hash;
+				for (var i = 0; i < this.length; i++) {
+					hash = this.charCodeAt(i) + ((hash << 5) - hash);
+					hash = hash & hash;
+				}
+				return hash % 360;
 			}
 		</script>
 	</head>
@@ -78,28 +90,27 @@
 			<form><button type="submit" name="date" value="{{next_date_str}}">&#9658;</button></form>
 		</div>
 		<div id="tabs">
-			{% for graph, data in graphs.items() %}
+			{% for graph, data in graph_data.items() %}
 				<span class="tab" id="tab-{{graph}}" onclick="setTab('{{graph}}')">{{graph}}</span>
 			{% endfor %}
 		</div>
 		<div id="graph-container">
-			{% for graph, data in graphs.items() %}
+			{% for graph, data in graph_data.items() %}
 				<div class="graph" id="{{graph}}"> 
-					<!-- ¯\_(ツ)_/¯ -->
 					<canvas id="chart-{{graph}}"></canvas>
 					<script type="text/javascript">
 						new Chart(document.getElementById('chart-{{graph}}').getContext('2d'), {
 							type: "scatter",
 							data: {
 								datasets: [
-									{% for label, tmp in data[0].items() %}
+									{% for sensor, entries in data.items() %}
 										{
-											label: "{{label}}",
-											data: {
-												{% for entry in data %}
-													{x: {{entry.time}}, y: {{entry[label]}}},
+											label: "{{sensor}}",
+											data: [
+												{% for time, entry in entries.items() %}
+													{x: {{time}}, y: {{entry}}},
 												{% endfor %}
-											}
+											], fill: false, borderColor: "hsl(" + "{{sensor}}".toHue() + ", 100%, 50%)", borderWidth: 2.5, showLine: true
 										},
 									{% endfor %}
 								]
