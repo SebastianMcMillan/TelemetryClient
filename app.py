@@ -55,21 +55,10 @@ def daily():
 	prev_date_str = (date-timedelta(1)).strftime('%Y-%m-%d')
 	next_date_str = (date+timedelta(1)).strftime('%Y-%m-%d')
 	
-	#print("==== " + date_str + " ====" + "="*100)
-	
-	
-	# Get the data from the database corresponding to the correct date
-	db_data = db.collection(DATABASE_COLLECTION).where("date", "==", date_str).stream()
-	try:
-		readings = next(db_data).to_dict()["telemetry"] # The map within the read document
-		readings = OrderedDict(sorted(readings.items())) # Sort the map
-		#print("readings: " + str(readings))
-	except StopIteration:
-		readings = {} # No document for day requested
-	
+	#print("==== " + date_str + " ====" + "="*100)	
 	
 	graph_data = OrderedDict() # The data rearranged for usage in the render template (see format below)
-	""" graph_data {
+	""" graph_data = {
 			"Battery": {
 				"Voltage": {"1579970374000": 423, "1579970379000": 419, ...},
 				"Current": {"1579970374000": 46, "1579970379000": 48, ...},
@@ -77,11 +66,8 @@ def daily():
 			}, "Solar": ...
 		} """
 	
-	
-	# Tabs array represents each different graph tab the user can look at
-	tabs = []
+	# TODO: Now that there is a collection for each sensor, all tabs should not be loaded at once
 	for tab, tab_data in client_format.items():
-		tabs.append(tab)
 		graph_data[tab] = OrderedDict()
 		#print("===== TAB: " + tab + " =====")
 		
@@ -91,15 +77,21 @@ def daily():
 			# Find the info about the sensor
 			sensor = next((item for item in db_format if item["id"] == sensor_id), None)
 			# Ensure the sensor is in the database
-			if sensor is not None and "index" in sensor:
+			if sensor is not None and "name" in sensor:
 				graph_data[tab][sensor["name"]] = OrderedDict()
 				#print("-- " + str(sensor["index"]) + ": " + sensor_id + " --")
 				
 				# Loop through all the sensor readings for the day being viewed
-				for time, reading in readings.items():					
-					unix = int(date.timestamp() + int(time))*1000 # TODO: Timezone incorrect
-					graph_data[tab][sensor["name"]][unix] = reading[sensor["index"]]
-					#print(str(unix) + ": " + str(reading[sensor["index"]]))
+				db_data = db.collection(DATABASE_COLLECTION).document(date_str).collection(sensor["id"]).stream()
+				try:
+					readings = next(db_data).to_dict()["seconds"] # The map within the sensor's document
+				except StopIteration:
+					continue # Skip sensors not in database
+				
+				for time, reading in sorted({int(k) : v for k, v in readings.items()}.items()):					
+					unix = int(date.timestamp() + int(time))*1000
+					graph_data[tab][sensor["name"]][unix] = reading
+					#print(str(unix) + ": " + str(reading))
 			
 		
 	#print("graph_data: " + json.dumps(graph_data))
