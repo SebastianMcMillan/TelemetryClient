@@ -125,24 +125,18 @@ def dummy():
 		readings = next(db_data)
 		return "Date already has data"
 	except StopIteration: # This means we're good to generate data
-		dummy_data = {
-			"date": date_str,
-			"telemetry": {
-			}
-		}
+		pass
 		
-		#for i in range(randint(20000, 40000), randint(70000, 80000), 5):
-		#for i in range(randint(55000, 60000), randint(65000, 70000), 5):
-		for i in range(20000, 40000, 5):
-			dummy_data["telemetry"][str(i)] = [
-				randint(300, 400),
-				randint(200, 500),
-				randint(0, 1)
-			]
-			
-		#db.collection(DATABASE_COLLECTION).document("ID GOES HERE").set(dummy_data, merge=True)
-		db.collection(DATABASE_COLLECTION).add(dummy_data)
-		
+	TEST_SENSORS = {"battery_voltage": [300, 400], "battery_current": [200, 500], "bms_fault": [0, 1], "battery_level": [60, 70]};
+	date_doc = db.collection(DATABASE_COLLECTION).document(date_str)
+	
+	for sensor, rand_range in TEST_SENSORS.items():
+		dummy_data = {"seconds": {}}
+		for i in range(0, 86400, 5):
+			dummy_data["seconds"][str(i)] = randint(rand_range[0], rand_range[1])
+		date_doc.collection(sensor).document("0").set(dummy_data, merge=True)
+		print(dummy_data)
+	
 	return "OK"
 	
 if __name__ == '__main__':
