@@ -102,23 +102,25 @@
 									{
 										label: "{{sensor}}",
 										data: [
-											{% for time, entry in entries.items() %}
-												{x: {{time}}, y: {{entry}}},
-											{% endfor %}
+											{% for time, entry in entries.items() %}{x:{{time}},y:{{entry}}},{% endfor %}
 										], fill: false, borderColor: "hsl(" + "{{sensor}}".toHue() + ", 100%, 50%)", borderWidth: 2.5, showLine: true
 									},
 								{% endfor %}
 							]
 						},
 						options: {
+							animation: {duration: 0},
+							responsiveAnimationDuration: 0,
 							maintainAspectRatio: false,
 							tooltips: {mode: "index", intersect: false},
-							hover: {mode: "index", intersect: false},
+							hover: {mode: "index", intersect: false, animationDuration: 0},
+							elements: {line: {tension: 0}},
 							scales: {
 								xAxes: [{
 									type: "time",
 									scaleLabel: {display: true, labelString: "Hour"}, 
-									time: {unit: "hour"},										
+									time: {unit: "hour"},
+									tiks: {minRotation: 0, maxRotation: 0, sampleSize: 10}
 								}],
 								yAxes: [{
 									//ticks: {beginAtZero: true}
