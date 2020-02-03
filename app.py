@@ -10,7 +10,10 @@ from firebase_admin import firestore
 import json
 from collections import OrderedDict
 
+import numpy as np # For downsampling
 from random import randint # For generating test data
+
+MAX_POINTS = 500 # Min/max downsample data to this amount if larger
 
 CLIENT_FORMAT_FILE = "client_format.json"
 DATABASE_FORMAT_FILE = "database_format.json"
@@ -88,8 +91,16 @@ def daily():
 			except StopIteration:
 				continue # Skip sensors not in database
 			
-			for time, reading in sorted({int(k) : v for k, v in readings.items()}.items()):					
-				unix = int(date.timestamp() + int(time))*1000
+			# Convert keys from strings to ints and sort (conversion required for sort to be correct)
+			# Then convert the sorted list of tuples into two separate lists using zip
+			times, readings = zip(*sorted({int(k) : v for k, v in readings.items()}.items()))
+			
+			# Downsample data if needed
+			if len(readings) > MAX_POINTS:
+				times, readings = min_max_downsample(np.array(times), np.array(readings), MAX_POINTS)
+			
+			for time, reading in zip(times, readings):				
+				unix = int(date.timestamp() + time)*1000
 				graph_data[sensor["name"]][unix] = reading
 				#print(str(unix) + ": " + str(reading))
 		
@@ -97,6 +108,20 @@ def daily():
 	#print("graph_data: " + json.dumps(graph_data))
 	
 	return render_template('daily.html', **locals())
+	
+# https://stackoverflow.com/questions/54449631/improve-min-max-downsampling
+def min_max_downsample(x, y, num_bins):
+    pts_per_bin = x.size // num_bins
+
+    x_view = x[:pts_per_bin*num_bins].reshape(num_bins, pts_per_bin)
+    y_view = y[:pts_per_bin*num_bins].reshape(num_bins, pts_per_bin)
+    i_min = np.argmin(y_view, axis=1)
+    i_max = np.argmax(y_view, axis=1)
+
+    r_index = np.repeat(np.arange(num_bins), 2)
+    c_index = np.sort(np.stack((i_min, i_max), axis=1)).ravel()
+
+    return x_view[r_index, c_index], y_view[r_index, c_index]
 	
 @app.route('/longterm', methods=['GET'])
 def longterm():
