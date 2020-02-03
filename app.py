@@ -49,50 +49,50 @@ def daily():
 	except ValueError:
 		# Default to today (at midnight) if not
 		date = datetime.combine(datetime.today(), datetime.min.time())
-		
+	
 	# Formatted date strings when rendering page and buttons to other dates
 	date_str = date.strftime('%Y-%m-%d')
 	prev_date_str = (date-timedelta(1)).strftime('%Y-%m-%d')
 	next_date_str = (date+timedelta(1)).strftime('%Y-%m-%d')
 	
-	#print("==== " + date_str + " ====" + "="*100)	
+	tab_list = client_format.keys()
 	
-	graph_data = OrderedDict() # The data rearranged for usage in the render template (see format below)
+	try:
+		tab = request.args.get('tab')
+		if not tab in client_format.keys(): raise ValueError()
+	except ValueError:
+		tab = next(iter(client_format))
+	
+	#print("==== " + date_str: tab + " ====" + "="*100)	
+	
+	graph_data = OrderedDict() # The data used in the render template (see format below)
 	""" graph_data = {
-			"Battery": {
-				"Voltage": {"1579970374000": 423, "1579970379000": 419, ...},
-				"Current": {"1579970374000": 46, "1579970379000": 48, ...},
-				...
-			}, "Solar": ...
+			"Voltage": {"1579970374000": 423, "1579970379000": 419, ...},
+			"Current": {"1579970374000": 46, "1579970379000": 48, ...},
 		} """
 	
-	# TODO: Now that there is a collection for each sensor, all tabs should not be loaded at once
-	for tab, tab_data in client_format.items():
-		graph_data[tab] = OrderedDict()
-		#print("===== TAB: " + tab + " =====")
-		
-		# Loop through every sensor the current tab should show a reading for
-		for sensor_id in tab_data["lines"]:
-		
-			# Find the info about the sensor
-			sensor = next((item for item in db_format if item["id"] == sensor_id), None)
-			# Ensure the sensor is in the database
-			if sensor is not None and "name" in sensor:
-				graph_data[tab][sensor["name"]] = OrderedDict()
-				#print("-- " + str(sensor["index"]) + ": " + sensor_id + " --")
-				
-				# Loop through all the sensor readings for the day being viewed
-				db_data = db.collection(DATABASE_COLLECTION).document(date_str).collection(sensor["id"]).stream()
-				try:
-					readings = next(db_data).to_dict()["seconds"] # The map within the sensor's document
-				except StopIteration:
-					continue # Skip sensors not in database
-				
-				for time, reading in sorted({int(k) : v for k, v in readings.items()}.items()):					
-					unix = int(date.timestamp() + int(time))*1000
-					graph_data[tab][sensor["name"]][unix] = reading
-					#print(str(unix) + ": " + str(reading))
+	# Loop through every sensor the current tab should show a reading for
+	for sensor_id in client_format[tab]["lines"]:
+	
+		# Find the info about the sensor
+		sensor = next((item for item in db_format if item["id"] == sensor_id), None)
+		# Ensure the sensor is in the database
+		if sensor is not None and "name" in sensor:
+			graph_data[sensor["name"]] = OrderedDict()
+			#print("-- " + str(sensor["index"]) + ": " + sensor_id + " --")
 			
+			# Loop through all the sensor readings for the day being viewed
+			db_data = db.collection(DATABASE_COLLECTION).document(date_str).collection(sensor["id"]).stream()
+			try:
+				readings = next(db_data).to_dict()["seconds"] # The map within the sensor's document
+			except StopIteration:
+				continue # Skip sensors not in database
+			
+			for time, reading in sorted({int(k) : v for k, v in readings.items()}.items()):					
+				unix = int(date.timestamp() + int(time))*1000
+				graph_data[sensor["name"]][unix] = reading
+				#print(str(unix) + ": " + str(reading))
+		
 		
 	#print("graph_data: " + json.dumps(graph_data))
 	
@@ -116,7 +116,7 @@ def dummy():
 	try:
 		readings = next(db_data)
 		return "Date already has data"
-	except StopIteration: # This means we're good to generate data
+	except StopIteration: # This means its safe to generate data (without overwriting)
 		pass
 		
 	TEST_SENSORS = {"battery_voltage": [300, 400], "battery_current": [200, 500], "bms_fault": [0, 1], "battery_level": [60, 70]};
@@ -127,7 +127,7 @@ def dummy():
 		for i in range(0, 86400, 5):
 			dummy_data["seconds"][str(i)] = randint(rand_range[0], rand_range[1])
 		date_doc.collection(sensor).document("0").set(dummy_data, merge=True)
-		print(dummy_data)
+		#print(dummy_data)
 	
 	return "OK"
 	

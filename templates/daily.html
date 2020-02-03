@@ -27,6 +27,9 @@
 			#tabs {
 				z-index: 100;
 			}
+			#tabs form {
+				display: inline-block;
+			}
 			.tab {
 				display: inline-block;
 				background: #ddd;
@@ -51,7 +54,6 @@
 				padding: 0 8px 8px 8px;
 			}
 			.graph {
-				display: none;
 				width: 100%;
 				height: 100%;
 				background: white;
@@ -60,15 +62,6 @@
 			}
 		</style>
 		<script type="text/javascript">
-			const TABS = [{% for graph, data in graph_data.items() %}'{{graph}}', {% endfor %}];
-			function setTab(tab) {
-				for (var i = 0; i < TABS.length; i++) {
-					var isActiveTab = (TABS[i] == tab);
-					document.getElementById("tab-"+TABS[i]).classList.toggle("active", isActiveTab);
-					document.getElementById(TABS[i]).style.display = isActiveTab ? "block" : "none";
-				}
-			}
-			
 			// Seeded random color for string - in the future there should be colors in client_format.json
 			// https://gist.github.com/0x263b/2bdd90886c2036a1ad5bcf06d6e6fb37
 			String.prototype.toHue = function() {
@@ -85,55 +78,56 @@
 	<body>
 		<div id="bg"></div>
 		<div id="date-changer">
-			<form method="GET"><button type="submit" name="date" value="{{prev_date_str}}">&#9668;</button></form>
-			<form method="GET"><input type="date" name="date" value="{{date_str}}" oninput="this.form.submit()"></form>
-			<form><button type="submit" name="date" value="{{next_date_str}}">&#9658;</button></form>
+			<form><input type="hidden" name="tab" value="{{tab}}"><button type="submit" name="date" value="{{prev_date_str}}">&#9668;</button></form>
+			<form><input type="hidden" name="tab" value="{{tab}}"><input type="date" name="date" value="{{date_str}}" oninput="this.form.submit()"></form>
+			<form><input type="hidden" name="tab" value="{{tab}}"><button type="submit" name="date" value="{{next_date_str}}">&#9658;</button></form>
 		</div>
 		<div id="tabs">
-			{% for graph, data in graph_data.items() %}
-				<span class="tab" id="tab-{{graph}}" onclick="setTab('{{graph}}')">{{graph}}</span>
+			{% for tab_link in tab_list %}
+				<form>
+					<input type="hidden" name="date" value="{{date_str}}">
+					<button type="submit" name="tab" class="tab{% if tab_link == tab %} active{% endif %}" value="{{tab_link}}">{{tab_link}}</button>
+				</form>
 			{% endfor %}
 		</div>
 		<div id="graph-container">
-			{% for graph, data in graph_data.items() %}
-				<div class="graph" id="{{graph}}"> 
-					<canvas id="chart-{{graph}}"></canvas>
-					<script type="text/javascript">
-						new Chart(document.getElementById('chart-{{graph}}').getContext('2d'), {
-							type: "scatter",
-							data: {
-								datasets: [
-									{% for sensor, entries in data.items() %}
-										{
-											label: "{{sensor}}",
-											data: [
-												{% for time, entry in entries.items() %}
-													{x: {{time}}, y: {{entry}}},
-												{% endfor %}
-											], fill: false, borderColor: "hsl(" + "{{sensor}}".toHue() + ", 100%, 50%)", borderWidth: 2.5, showLine: true
-										},
-									{% endfor %}
-								]
-							},
-							options: {
-								maintainAspectRatio: false,
-								tooltips: {mode: "index", intersect: false},
-								hover: {mode: "index", intersect: false},
-								scales: {
-									xAxes: [{
-										type: "time",
-										scaleLabel: {display: true, labelString: "Hour"}, 
-										time: {unit: "hour"},										
-									}],
-									yAxes: [{
-										//ticks: {beginAtZero: true}
-									}]
-								}
+			<div class="graph" id="{{graph}}"> 
+				<canvas id="chart-{{graph}}"></canvas>
+				<script type="text/javascript">
+					new Chart(document.getElementById('chart-{{graph}}').getContext('2d'), {
+						type: "scatter",
+						data: {
+							datasets: [
+								{% for sensor, entries in graph_data.items() %}
+									{
+										label: "{{sensor}}",
+										data: [
+											{% for time, entry in entries.items() %}
+												{x: {{time}}, y: {{entry}}},
+											{% endfor %}
+										], fill: false, borderColor: "hsl(" + "{{sensor}}".toHue() + ", 100%, 50%)", borderWidth: 2.5, showLine: true
+									},
+								{% endfor %}
+							]
+						},
+						options: {
+							maintainAspectRatio: false,
+							tooltips: {mode: "index", intersect: false},
+							hover: {mode: "index", intersect: false},
+							scales: {
+								xAxes: [{
+									type: "time",
+									scaleLabel: {display: true, labelString: "Hour"}, 
+									time: {unit: "hour"},										
+								}],
+								yAxes: [{
+									//ticks: {beginAtZero: true}
+								}]
 							}
-						});
-					</script>
-				</div>
-			{% endfor %}
+						}
+					});
+				</script>
+			</div>
 		</div>
 	</body>
 </html>
