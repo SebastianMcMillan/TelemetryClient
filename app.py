@@ -60,40 +60,36 @@ def daily():
 	
 	tab_list = client_format.keys()
 	
+	# Try to get tab from GET parameter. If not provided or invalid, default to first tab.
 	try:
 		tab = request.args.get('tab')
 		if not tab in client_format.keys(): raise ValueError()
 	except ValueError:
 		tab = next(iter(client_format))
 	
-	#print("==== " + date_str: tab + " ====" + "="*100)	
-	
 	graph_data = OrderedDict() # The data used in the render template (see format below)
-	""" graph_data = {
-			"Voltage": {"1579970374000": 423, "1579970379000": 419, ...},
-			"Current": {"1579970374000": 46, "1579970379000": 48, ...},
-		} """
 	
 	# Loop through every sensor the current tab should show a reading for
 	for sensor_id in client_format[tab]["lines"]:
 	
 		# Find the info about the sensor
-		sensor = next((item for item in db_format if item["id"] == sensor_id), None)
+		sensor = db_format[sensor_id]
 		# Ensure the sensor is in the database
 		if sensor is not None and "name" in sensor:
 			graph_data[sensor["name"]] = OrderedDict()
-			#print("-- " + str(sensor["index"]) + ": " + sensor_id + " --")
 			
 			# Loop through all the sensor readings for the day being viewed
-			db_data = db.collection(DATABASE_COLLECTION).document(date_str).collection(sensor["id"]).stream()
+			db_data = db.collection(DATABASE_COLLECTION).document(date_str).collection(sensor_id).stream()
 			try:
 				readings = next(db_data).to_dict()["seconds"] # The map within the sensor's document
 			except StopIteration:
 				continue # Skip sensors not in database
 			
 			# Convert keys from strings to ints and sort (conversion required for sort to be correct)
-			# Then convert the sorted list of tuples into two separate lists using zip
-			times, readings = zip(*sorted({int(k) : v for k, v in readings.items()}.items()))
+			sorted_readings = sorted({int(k) : v for k, v in readings.items()}.items())
+			
+			# Convert the sorted list of tuples into two separate lists using zip
+			times, readings = zip(*sorted_readings)
 			
 			# Downsample data if needed
 			if len(readings) > MAX_POINTS:
@@ -102,10 +98,6 @@ def daily():
 			for time, reading in zip(times, readings):				
 				unix = int(date.timestamp() + time)*1000
 				graph_data[sensor["name"]][unix] = reading
-				#print(str(unix) + ": " + str(reading))
-		
-		
-	#print("graph_data: " + json.dumps(graph_data))
 	
 	return render_template('daily.html', **locals())
 	

@@ -1,55 +1,51 @@
-[
-	{
-		"index": 0,
-		"id": "battery_voltage",
+{
+	"battery_voltage": {
 		"category": "bms",
 		"name": "Battery Voltage",
 		"unit": " V"
-	},{
-		"index": 1,
-		"id": "battery_current",
+	},
+	"battery_current": {
 		"category": "bms",
 		"name": "Battery Current"
-	},{
-		"id": "battery_temperature",
+	},
+	"battery_temperature": {
 		"category": "bms"
-	},{
-		"id": "battery_level",
+	},
+	"battery_level": {
 		"category": "bms"
-	},{
-		"index": 2,
-		"id": "bms_fault",
+	},
+	"bms_fault": {
 		"category": "bms",
 		"name": "BMS Fault"
-	},{
-		"id": "hall_speed",
+	},
+	"hall_speed": {
 		"category": "motor"
-	},{
-		"id": "motor_power",
+	},
+	"motor_power": {
 		"category": "motor"
-	},{
-		"id": "motor_temperature",
+	},
+	"motor_temperature": {
 		"category": "motor"
-	},{
-		"id": "solar_voltage",
+	},
+	"solar_voltage": {
 		"category": "mppt"
-	},{
-		"id": "gps_lat",
+	},
+	"gps_lat": {
 		"category": "gps"
-	},{
-		"id": "gps_lon",
+	},
+	"gps_lon": {
 		"category": "gps"
-	},{
-		"id": "gps_speed",
+	},
+	"gps_speed": {
 		"category": "gps"
-	},{
-		"id": "gps_altitude",
+	},
+	"gps_altitude": {
 		"category": "gps"
-	},{
-		"id": "gps_sats",
+	},
+	"gps_sats": {
 		"category": "gps"
-	},{
-		"id": "cell_strength",
+	},
+	"cell_strength": {
 		"category": "cell"
 	}
-]
+}
