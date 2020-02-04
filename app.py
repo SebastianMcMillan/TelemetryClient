@@ -93,14 +93,24 @@ def daily():
 			
 			# Downsample data if needed
 			if len(readings) > MAX_POINTS:
-				times, readings = min_max_downsample(np.array(times), np.array(readings), MAX_POINTS)
+				#times, readings = min_max_downsample(np.array(times), np.array(readings), MAX_POINTS)
+				times, readings = avg_downsample(np.array(times), np.array(readings), MAX_POINTS)
 			
 			for time, reading in zip(times, readings):				
 				unix = int(date.timestamp() + time)*1000
 				graph_data[sensor["name"]][unix] = reading
 	
 	return render_template('daily.html', **locals())
-	
+
+# https://stackoverflow.com/questions/10847660/subsampling-averaging-over-a-numpy-array
+def avg_downsample(x, y, num_bins):
+	pts_per_bin = x.size // num_bins
+	end = pts_per_bin * int(len(y)/pts_per_bin)
+	x_avgs = np.mean(x[:end].reshape(-1, pts_per_bin), 1)
+	y_avgs = np.mean(y[:end].reshape(-1, pts_per_bin), 1)
+	y_avgs = np.round(y_avgs, 2)
+	return x_avgs, y_avgs
+
 # https://stackoverflow.com/questions/54449631/improve-min-max-downsampling
 def min_max_downsample(x, y, num_bins):
     pts_per_bin = x.size // num_bins
