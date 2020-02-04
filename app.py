@@ -93,7 +93,6 @@ def daily():
 			
 			# Downsample data if needed
 			if len(readings) > MAX_POINTS:
-				#times, readings = min_max_downsample(np.array(times), np.array(readings), MAX_POINTS)
 				times, readings = avg_downsample(np.array(times), np.array(readings), MAX_POINTS)
 			
 			for time, reading in zip(times, readings):				
@@ -111,6 +110,7 @@ def avg_downsample(x, y, num_bins):
 	y_avgs = np.round(y_avgs, 2)
 	return x_avgs, y_avgs
 
+# Currently not being used, but left as an option for the future
 # https://stackoverflow.com/questions/54449631/improve-min-max-downsampling
 def min_max_downsample(x, y, num_bins):
     pts_per_bin = x.size // num_bins
