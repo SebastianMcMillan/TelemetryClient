@@ -41,9 +41,9 @@ def index():
 def realtime():
 	return "NYI"
 	#return render_template('realtime.html', data=data)
-	
+
 # TODO: Endpoint for AJAX requests to update data on realtime page
-	
+
 @app.route('/daily', methods=['GET'])
 def daily():
 	try:
@@ -52,54 +52,57 @@ def daily():
 	except ValueError:
 		# Default to today (at midnight) if not
 		date = datetime.combine(datetime.today(), datetime.min.time())
-	
+
 	# Formatted date strings when rendering page and buttons to other dates
 	date_str = date.strftime('%Y-%m-%d')
 	prev_date_str = (date-timedelta(1)).strftime('%Y-%m-%d')
 	next_date_str = (date+timedelta(1)).strftime('%Y-%m-%d')
-	
+
 	tab_list = client_format.keys()
-	
+
 	# Try to get tab from GET parameter. If not provided or invalid, default to first tab.
 	try:
 		tab = request.args.get('tab')
 		if not tab in client_format.keys(): raise ValueError()
 	except ValueError:
 		tab = next(iter(client_format))
-	
+
 	graph_data = OrderedDict() # The data used in the render template (see format below)
-	
-	# Loop through every sensor the current tab should show a reading for
-	for sensor_id in client_format[tab]["lines"]:
-	
-		# Find the info about the sensor
-		sensor = db_format[sensor_id]
-		# Ensure the sensor is in the database
-		if sensor is not None and "name" in sensor:
-			graph_data[sensor["name"]] = OrderedDict()
-			
-			# Loop through all the sensor readings for the day being viewed
-			db_data = db.collection(DATABASE_COLLECTION).document(date_str).collection(sensor_id).stream()
-			try:
-				readings = next(db_data).to_dict()["seconds"] # The map within the sensor's document
-			except StopIteration:
-				continue # Skip sensors not in database
-			
-			# Convert keys from strings to ints and sort (conversion required for sort to be correct)
-			sorted_readings = sorted({int(k) : v for k, v in readings.items()}.items())
-			
-			# Convert the sorted list of tuples into two separate lists using zip
-			times, readings = zip(*sorted_readings)
-			
-			# Downsample data if needed
-			if len(readings) > MAX_POINTS:
-				times, readings = avg_downsample(np.array(times), np.array(readings), MAX_POINTS)
-			
-			for time, reading in zip(times, readings):				
-				unix = int(date.timestamp() + time)*1000
-				graph_data[sensor["name"]][unix] = reading
-	
-	return render_template('daily.html', **locals())
+
+	if tab == "Location":
+		return render_template('daily_location.html', **locals())  # Location tab uses separate template to display map
+	else:
+		# Loop through every sensor the current tab should show a reading for
+		for sensor_id in client_format[tab]["lines"]:
+
+			# Find the info about the sensor
+			sensor = db_format[sensor_id]
+			# Ensure the sensor is in the database
+			if sensor is not None and "name" in sensor:
+				graph_data[sensor["name"]] = OrderedDict()
+
+				# Loop through all the sensor readings for the day being viewed
+				db_data = db.collection(DATABASE_COLLECTION).document(date_str).collection(sensor_id).stream()
+				try:
+					readings = next(db_data).to_dict()["seconds"] # The map within the sensor's document
+				except StopIteration:
+					continue # Skip sensors not in database
+
+				# Convert keys from strings to ints and sort (conversion required for sort to be correct)
+				sorted_readings = sorted({int(k) : v for k, v in readings.items()}.items())
+
+				# Convert the sorted list of tuples into two separate lists using zip
+				times, readings = zip(*sorted_readings)
+
+				# Downsample data if needed
+				if len(readings) > MAX_POINTS:
+					times, readings = avg_downsample(np.array(times), np.array(readings), MAX_POINTS)
+
+				for time, reading in zip(times, readings):
+					unix = int(date.timestamp() + time)*1000
+					graph_data[sensor["name"]][unix] = reading
+
+		return render_template('daily.html', **locals())
 
 # https://stackoverflow.com/questions/10847660/subsampling-averaging-over-a-numpy-array
 def avg_downsample(x, y, num_bins):
@@ -124,11 +127,11 @@ def min_max_downsample(x, y, num_bins):
     c_index = np.sort(np.stack((i_min, i_max), axis=1)).ravel()
 
     return x_view[r_index, c_index], y_view[r_index, c_index]
-	
+
 @app.route('/longterm', methods=['GET'])
 def longterm():
 	return "NYI"
-	
+
 @app.route('/generate-dummy-data', methods=['GET'])
 def dummy():
 	try:
@@ -136,7 +139,7 @@ def dummy():
 		date = datetime.strptime(request.args.get('date', default=""), '%Y-%m-%d')
 	except ValueError:
 		return "Invalid or missing date GET parameter"
-	
+
 	# Ensure day does not have any (possibly real) data already (the exception is the goal)
 	date_str = date.strftime('%Y-%m-%d')
 	db_data = db.collection(DATABASE_COLLECTION).where("date", "==", date_str).stream()
@@ -145,18 +148,18 @@ def dummy():
 		return "Date already has data"
 	except StopIteration: # This means its safe to generate data (without overwriting)
 		pass
-		
+
 	TEST_SENSORS = {"battery_voltage": [300, 400], "battery_current": [200, 500], "bms_fault": [0, 1], "battery_level": [60, 70]};
 	date_doc = db.collection(DATABASE_COLLECTION).document(date_str)
-	
+
 	for sensor, rand_range in TEST_SENSORS.items():
 		dummy_data = {"seconds": {}}
 		for i in range(0, 86400, 5):
 			dummy_data["seconds"][str(i)] = randint(rand_range[0], rand_range[1])
 		date_doc.collection(sensor).document("0").set(dummy_data, merge=True)
 		#print(dummy_data)
-	
+
 	return "OK"
-	
+
 if __name__ == '__main__':
     app.run()
