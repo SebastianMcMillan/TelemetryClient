@@ -70,7 +70,7 @@ def daily():
 	graph_data = OrderedDict() # The data used in the render template (see format below)
 
 	if tab == "Location":
-		return render_template('daily_location.html', **locals()) # Location tab uses separate template to display map
+		return render_template('daily_location.html', **locals())  # Location tab uses separate template to display map
 	else:
 		# Loop through every sensor the current tab should show a reading for
 		for sensor_id in client_format[tab]["lines"]:
