@@ -1,5 +1,21 @@
 var map = null;
 
+var firebaseConfig = {
+                apiKey: "AIzaSyAgnNvoWACZjxgey_Dd54zlyRN6X65SSug",
+                authDomain: "ku-solar-car-b87af.firebaseapp.com",
+                databaseURL: "https://ku-solar-car-b87af.firebaseio.com",
+                projectId: "ku-solar-car-b87af",
+                storageBucket: "ku-solar-car-b87af.appspot.com",
+                messagingSenderId: "840177102905",
+                appId: "1:840177102905:web:c475831bc192c5d4f09de8",
+                measurementId: "G-GWKJM2LZWE"
+            };
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+var database = firebase.database();
+
+
 function initMap() {
     // The location of Daytona
     var location = {lat: 29.187668, lng: -81.072786};
