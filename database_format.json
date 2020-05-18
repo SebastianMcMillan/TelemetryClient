@@ -6,46 +6,63 @@
 	},
 	"battery_current": {
 		"category": "bms",
-		"name": "Battery Current"
+		"name": "Output Current",
+		"unit": " A"
 	},
 	"battery_temperature": {
-		"category": "bms"
-	},
-	"battery_level": {
-		"category": "bms"
+		"category": "bms",
+		"name": "Battery Temperature",
+		"unit": "&deg;C"
 	},
 	"bms_fault": {
 		"category": "bms",
-		"name": "BMS Fault"
+		"name": "Isolation Fault Sensor"
 	},
-	"hall_speed": {
-		"category": "motor"
+	"gps_time": {
+		"category": "gps",
+		"name": "GPS Timestamp"
 	},
-	"motor_power": {
-		"category": "motor"
+	"gps_lat": {
+		"category": "gps",
+		"name": "Latitude",
+		"unit": "&deg;"
 	},
-	"motor_temperature": {
-		"category": "motor"
+	"gps_lon": {
+		"category": "gps",
+		"name": "Longitude",
+		"unit": "&deg;"
+	},
+	"gps_velocity_east": {
+		"category": "gps",
+		"name": "Eastward velocity (via GPS)",
+		"unit": " mph"
+	},
+	"gps_velocity_north": {
+		"category": "gps",
+		"name": "Northward velocity (via GPS)",
+		"unit": " mph"
+	},
+	"gps_velocity_up": {
+		"category": "gps",
+		"name": "Upward velocity (via GPS)",
+		"unit": " mph"
+	},
+	"gps_speed": {
+		"category": "gps",
+		"name": "Car speed (via GPS)",
+		"unit": " kn"
 	},
 	"solar_voltage": {
 		"category": "mppt"
 	},
-	"gps_lat": {
-		"category": "gps"
+	"solar_current": {
+		"category": "mppt",
+		"name": "Input current (from solar)",
+		"unit": " A"
 	},
-	"gps_lon": {
-		"category": "gps"
-	},
-	"gps_speed": {
-		"category": "gps"
-	},
-	"gps_altitude": {
-		"category": "gps"
-	},
-	"gps_sats": {
-		"category": "gps"
-	},
-	"cell_strength": {
-		"category": "cell"
+	"motor_speed": {
+		"category": "motor",
+		"name": "Car speed (via motor controller)",
+		"unit": " mph"
 	}
 }

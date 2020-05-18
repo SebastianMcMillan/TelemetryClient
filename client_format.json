@@ -1,20 +1,15 @@
 {
 	"Battery": {
-		"lines": ["battery_voltage", "battery_current", "battery_level", "bms_fault"]
+		"lines": ["battery_voltage", "battery_current", "bms_fault"]
 	},
 	"Solar": {
-		"lines": ["solar_voltage"]
+		"lines": ["solar_voltage", "solar_current"]
 	},
-	"Location": {
-		"lines": ["gps_lat", "gps_lon"]
-	},
+	"Location": {},
 	"Speed": {
-		"lines": ["hall_speed", "gps_speed"]
+		"lines": ["motor_speed", "gps_speed", "gps_velocity_east", "gps_velocity_north", "gps_velocity_up"]
 	},
 	"Temperatures": {
-		"lines": ["battery_temperature", "motor_temperature"]
+		"lines": ["battery_temperature"]
 	},
-	"Motor": {
-		"lines": ["motor_power"]
-	}
 }
