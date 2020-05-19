@@ -11,5 +11,5 @@
 	},
 	"Temperatures": {
 		"lines": ["battery_temperature"]
-	},
+	}
 }
