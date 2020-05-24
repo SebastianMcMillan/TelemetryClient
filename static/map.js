@@ -13,7 +13,6 @@ function set_select(select, value) {
 set_select(document.getElementById("start-time"), starttime.toString());
 set_select(document.getElementById("end-time"), endtime.toString());
 
-
 // verify dropdown values
 function on_select_change() {
     let start = Number(document.getElementById("start-time").value);
@@ -26,7 +25,6 @@ function on_select_change() {
     }
 
 }
-
 
 // map
 function draw_map() {

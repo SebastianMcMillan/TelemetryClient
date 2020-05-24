@@ -112,7 +112,6 @@
             </form>
         </div>
 
-
 		<div id="tabs">
 			{% for tab_link in tab_list %}
 				<form>
@@ -121,8 +120,9 @@
 				</form>
 			{% endfor %}
 		</div>
+
         <div style="height: 8px"></div>
-        <div id="times">  <!-- TODO: style these -->
+        <div id="times">
             <form id="time-form">
                 <input type="hidden" name="date" value="{{date_str}}">
                 <input type="hidden" name="tab" value="{{tab}}">
@@ -186,6 +186,7 @@
         <!--The div element for the map -->
         <div id="map"></div>
 
+        <!-- Hidden by default -->
         <div id="no-info">
             <h3>No Activity For Selected Period</h3>
         </div>
