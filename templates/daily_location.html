@@ -61,6 +61,18 @@
 				border: 1px solid black;
 				border-radius: 4px;
 			}
+            #map {
+                width: 99%;
+                margin: auto;
+                height: 95%;
+            }
+            #no-info {
+                width:25%;
+                height: 10%;
+                margin: auto;
+                margin-top: 20px;
+                display: none;
+            }
 		</style>
 		<script type="text/javascript">
 			// Seeded random color for string - in the future there should be colors in client_format.json
@@ -172,12 +184,16 @@
         </div>
 
         <!--The div element for the map -->
-        <div id="map" style="width:99%; margin:auto; height:95%"></div>
+        <div id="map"></div>
+
+        <div id="no-info">
+            <h3>No Activity For Selected Period</h3>
+        </div>
 
         <!-- Map script-->
         <script src="../static/map.js"></script>
 
-        <!-- Initialize map TODO: uncomment -->
-        <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhSAsZyMmmRGxnH7g_BnV6jrU7Xc30goI&callback=draw_map"></script> -->
+        <!-- Initialize map -->
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhSAsZyMmmRGxnH7g_BnV6jrU7Xc30goI&callback=draw_map"></script>
 	</body>
 </html>
