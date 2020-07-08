@@ -70,6 +70,9 @@ def daily():
 	graph_data = OrderedDict() # The data used in the render template (see format below)
 
 	if tab == "Location":  # Location tab uses separate template to display map
+	  	# url to initialize Google Maps API, to be injected into HTML
+		maps_url = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBXAF6nEg6wg-hbla-xU28io7HhDWINqZQ&callback=draw_map"
+
 		try:
 			# the times, in seconds from 0 on the day, for which to display data
 			starttime = int(request.args.get('starttime', default=''))

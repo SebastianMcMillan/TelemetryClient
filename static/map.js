@@ -34,7 +34,7 @@ function draw_map() {
         return;
     }
 
-    // location_pairs: [(lat0, lon0), (lat1, lon1), ...] coordinates: [{lat: lat0, lng: lng0}, ...]
+    // location_pairs: [[lat0, lon0], [lat1, lon1], ...] coordinates: [{lat: lat0, lng: lng0}, ...]
     let coordinates = pairs_to_coordinates(location_pairs);
 
     // initialize the map
@@ -72,6 +72,6 @@ function pairs_to_coordinates(pairs) {
     for(let i=0; i < pairs.length; i++) {
         coordinates.push({lat: pairs[i][0], lng: pairs[i][1]});
     }
-
+    console.log(coordinates)
     return coordinates
 }
