@@ -64,7 +64,7 @@ function draw_map() {
 }
 
 function make_marker(coordinate, map) {
-    return new google.maps.Marker({position: coordinate, map: map})
+    return new google.maps.Marker({position: coordinate, map: map});
 }
 
 function pairs_to_coordinates(pairs) {
@@ -73,5 +73,5 @@ function pairs_to_coordinates(pairs) {
         coordinates.push({lat: pairs[i][0], lng: pairs[i][1]});
     }
     console.log(coordinates)
-    return coordinates
+    return coordinates;
 }
