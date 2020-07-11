@@ -13,6 +13,8 @@ from collections import OrderedDict
 import numpy as np # For downsampling
 from random import randint # For generating test data
 
+from google_maps_key import key
+
 MAX_POINTS = 500 # Min/max downsample data to this amount if larger
 
 CLIENT_FORMAT_FILE = "client_format.json"
@@ -55,8 +57,8 @@ def daily():
 
 	# Formatted date strings when rendering page and buttons to other dates
 	date_str = date.strftime('%Y-%m-%d')
-	prev_date_str = (date-timedelta(1)).strftime('%Y-%m-%d')
-	next_date_str = (date+timedelta(1)).strftime('%Y-%m-%d')
+	prev_date_str = (date-timedelta(days=1)).strftime('%Y-%m-%d')
+	next_date_str = (date+timedelta(days=1)).strftime('%Y-%m-%d')
 
 	tab_list = client_format.keys()
 
@@ -69,8 +71,48 @@ def daily():
 
 	graph_data = OrderedDict() # The data used in the render template (see format below)
 
-	if tab == "Location":
-		return render_template('daily_location.html', **locals())  # Location tab uses separate template to display map
+	if tab == "Location":  # Location tab uses separate template to display map
+	  	# url to initialize Google Maps API, to be injected into HTML. key value from local google_maps_key.py file
+		maps_url = key
+
+		try:
+			# the times, in seconds from 0 on the day, for which to display data
+			starttime = int(request.args.get('starttime', default=''))
+			endtime = int(request.args.get('endtime', default=''))
+		except ValueError:
+			# default to whole day if not provided by GET parameter
+			starttime = 0
+			endtime = 86400
+
+		# get list of latitudes; lat_gen is a generator of document snapshots, but will only yield one snapshot
+		# with how the database is currently set up
+		lat_gen = db.collection(DATABASE_COLLECTION).document(date_str).collection('gps_lat').stream()
+
+		# avoid throwing an error if there's no data for the day (lat_gen will yield no values)
+		try:
+			lat_reading_dict = next(lat_gen).to_dict()["seconds"]  # reading_dict format: {'second': reading}, ex. {'10': 334}
+		except StopIteration:
+			location_pairs = None
+			return render_template('daily_location.html', **locals())
+
+		lat_reading_list = sorted({int(k): v for k, v in lat_reading_dict.items() if starttime <= int(k) <= endtime}.items())
+		sec_list, lat_list = zip(*lat_reading_list)
+
+		# get list of longitudes
+		lon_gen = db.collection(DATABASE_COLLECTION).document(date_str).collection('gps_lon').stream()
+
+		try:
+			lon_reading_dict = next(lon_gen).to_dict()["seconds"]
+		except StopIteration:
+			location_pairs = None
+			return render_template('daily_location.html', **locals())
+
+		lon_reading_list = sorted({int(k): v for k, v in lon_reading_dict.items() if starttime <= int(k) <= endtime}.items())
+		sec_list, lon_list = zip(*lon_reading_list)
+
+		location_pairs = zip(lat_list, lon_list)  # [(lat0, lon0), (lat1, lon1), ...]
+
+		return render_template('daily_location.html', **locals())
 	else:
 		# Loop through every sensor the current tab should show a reading for
 		for sensor_id in client_format[tab]["lines"]:

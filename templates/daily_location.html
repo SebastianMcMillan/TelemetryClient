@@ -61,6 +61,20 @@
 				border: 1px solid black;
 				border-radius: 4px;
 			}
+            #map {
+                width: 99%;
+                margin: auto;
+                height: 95%;
+            }
+            #no-info {
+                max-width: 400px;
+                margin: 50px auto;
+                padding: 15px;
+                display: none;
+                border-style: solid;
+                border-width: thin;
+                border-radius: 5px;
+            }
 		</style>
 		<script type="text/javascript">
 			// Seeded random color for string - in the future there should be colors in client_format.json
@@ -73,17 +87,31 @@
 					hash = hash & hash;
 				}
 				return hash % 360;
-			}
+			};
+
+			// pass list of location pairs for use in js map drawing
+            let location_pairs = {{ location_pairs|tojson }};
+
+            // pass starttime and endtime, needed to set dropdowns on page reload
+            let starttime = {{ starttime }};
+            let endtime = {{ endtime }};
 		</script>
 	</head>
 	<body>
 		<div id="bg"></div>
-        <div id="time-date-wrap">
-		    <div id="date-changer"> <!-- TODO: date-change and time-change should be in the same line -->
-			    <form><input type="hidden" name="tab" value="{{tab}}"><button type="submit" name="date" value="{{prev_date_str}}">&#9668;</button></form>
-			    <form><input type="hidden" name="tab" value="{{tab}}"><input type="date" name="date" value="{{date_str}}" oninput="this.form.submit()"></form>
-			    <form><input type="hidden" name="tab" value="{{tab}}"><button type="submit" name="date" value="{{next_date_str}}">&#9658;</button></form>
-		    </div>
+        <div id="date-changer">
+            <form>
+                <input type="hidden" name="tab" value="{{tab}}">
+                <button type="submit" name="date" value="{{prev_date_str}}">&#9668;</button>
+            </form>
+            <form>
+                <input type="hidden" name="tab" value="{{tab}}">
+                <input type="date" name="date" value="{{date_str}}" oninput="this.form.submit()">
+            </form>
+            <form>
+                <input type="hidden" name="tab" value="{{tab}}">
+                <button type="submit" name="date" value="{{next_date_str}}">&#9658;</button>
+            </form>
         </div>
 
 		<div id="tabs">
@@ -95,78 +123,80 @@
 			{% endfor %}
 		</div>
 
-        <div id="time-changer">  <!-- TODO: style these -->
+        <div style="height: 8px"></div>
+        <div id="times">
+            <form id="time-form">
+                <input type="hidden" name="date" value="{{date_str}}">
+                <input type="hidden" name="tab" value="{{tab}}">
                 <label for="start-time">From: </label>
-                <select id="start-time" onchange="update_map()">
+                <select id="start-time" name="starttime" onchange="on_select_change()">
                     <option value="0" selected>12 AM</option>
-                    <option value="1">1 AM</option>
-                    <option value="2">2 AM</option>
-                    <option value="3">3 AM</option>
-                    <option value="4">4 AM</option>
-                    <option value="5">5 AM</option>
-                    <option value="6">6 AM</option>
-                    <option value="7">7 AM</option>
-                    <option value="8">8 AM</option>
-                    <option value="9">9 AM</option>
-                    <option value="10">10 AM</option>
-                    <option value="11">11 AM</option>
-                    <option value="12">12 PM</option>
-                    <option value="13">1 PM</option>
-                    <option value="14">2 PM</option>
-                    <option value="15">3 PM</option>
-                    <option value="16">4 PM</option>
-                    <option value="17">5 PM</option>
-                    <option value="18">6 PM</option>
-                    <option value="19">7 PM</option>
-                    <option value="20">8 PM</option>
-                    <option value="21">9 PM</option>
-                    <option value="22">10 PM</option>
-                    <option value="23">11 PM</option>
-                    <option value="24">12 PM</option>
+                    <option value="3600">1 AM</option>
+                    <option value="7200">2 AM</option>
+                    <option value="10800">3 AM</option>
+                    <option value="14400">4 AM</option>
+                    <option value="18000">5 AM</option>
+                    <option value="21600">6 AM</option>
+                    <option value="25200">7 AM</option>
+                    <option value="28800">8 AM</option>
+                    <option value="32400">9 AM</option>
+                    <option value="36000">10 AM</option>
+                    <option value="39600">11 AM</option>
+                    <option value="43200">12 PM</option>
+                    <option value="46800">1 PM</option>
+                    <option value="50400">2 PM</option>
+                    <option value="54000">3 PM</option>
+                    <option value="57600">4 PM</option>
+                    <option value="61200">5 PM</option>
+                    <option value="64800">6 PM</option>
+                    <option value="68400">7 PM</option>
+                    <option value="72000">8 PM</option>
+                    <option value="75600">9 PM</option>
+                    <option value="79200">10 PM</option>
+                    <option value="82800">11 PM</option>
                 </select>
                 <label for="end-time">To: </label>
-                <select id="end-time" onchange="update_map()">
-                    <option value="0">12 AM</option>
-                    <option value="1">1 AM</option>
-                    <option value="2">2 AM</option>
-                    <option value="3">3 AM</option>
-                    <option value="4">4 AM</option>
-                    <option value="5">5 AM</option>
-                    <option value="6">6 AM</option>
-                    <option value="7">7 AM</option>
-                    <option value="8">8 AM</option>
-                    <option value="9">9 AM</option>
-                    <option value="10">10 AM</option>
-                    <option value="11">11 AM</option>
-                    <option value="12">12 PM</option>
-                    <option value="13">1 PM</option>
-                    <option value="14">2 PM</option>
-                    <option value="15">3 PM</option>
-                    <option value="16">4 PM</option>
-                    <option value="17">5 PM</option>
-                    <option value="18">6 PM</option>
-                    <option value="19">7 PM</option>
-                    <option value="20">8 PM</option>
-                    <option value="21">9 PM</option>
-                    <option value="22">10 PM</option>
-                    <option value="23">11 PM</option>
-                    <option value="24" selected>12 PM</option>
+                <select id="end-time" name="endtime" onchange="on_select_change()">
+                    <option value="3600">1 AM</option>
+                    <option value="7200">2 AM</option>
+                    <option value="10800">3 AM</option>
+                    <option value="14400">4 AM</option>
+                    <option value="18000">5 AM</option>
+                    <option value="21600">6 AM</option>
+                    <option value="25200">7 AM</option>
+                    <option value="28800">8 AM</option>
+                    <option value="32400">9 AM</option>
+                    <option value="36000">10 AM</option>
+                    <option value="39600">11 AM</option>
+                    <option value="43200">12 PM</option>
+                    <option value="46800">1 PM</option>
+                    <option value="50400">2 PM</option>
+                    <option value="54000">3 PM</option>
+                    <option value="57600">4 PM</option>
+                    <option value="61200">5 PM</option>
+                    <option value="64800">6 PM</option>
+                    <option value="68400">7 PM</option>
+                    <option value="72000">8 PM</option>
+                    <option value="75600">9 PM</option>
+                    <option value="79200">10 PM</option>
+                    <option value="82800">11 PM</option>
+                    <option value="86400">11:59 PM</option>
                 </select>
-            </div>
+            </form>
+        </div>
 
         <!--The div element for the map -->
-        <div id="map" style="width:99%; margin:auto; height:95%"></div>
-            <!-- JS for Firebase -->
-            <!-- The core Firebase JS SDK is always required and must be listed first -->
-            <script src="https://www.gstatic.com/firebasejs/7.8.0/firebase-app.js"></script>
-            <!-- Realtime database -->
-            <script src="https://www.gstatic.com/firebasejs/7.8.0/firebase-database.js"></script>
+        <div id="map"></div>
 
-            <!-- Initialize map -->
-            <!-- My Script -->
-            <script src="../static/map.js"></script>
+        <!-- Hidden by default -->
+        <div id="no-info">
+            <h3>No Activity For Selected Period</h3>
+        </div>
 
-            <!-- JS to initialize map -->
-            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAI0alGN1v2HEMQvKXrXoWQJ9G9jRIHYI&callback=initMap"></script>
+        <!-- Map script-->
+        <script src="../static/map.js"></script>
+
+        <!-- Initialize map -->
+        <script src="{{ maps_url }}"></script>
 	</body>
 </html>

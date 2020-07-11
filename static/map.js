@@ -1,43 +1,77 @@
-var map = null;
+"use strict";
 
-function initMap() {
-    // The location of Daytona
-    var location = {lat: 29.187668, lng: -81.072786};
+// set initial values for time dropdowns
+function set_select(select, value) {
+    let options = select.options;
+    for (let i = 0; i < options.length; i++) {
+        if (options[i].value === value) {
+            options[i].selected = true;
+            break;
+        }
+    }
+}
+set_select(document.getElementById("start-time"), starttime.toString());
+set_select(document.getElementById("end-time"), endtime.toString());
 
-    // The map, centered at Daytona
-    map = new google.maps.Map(document.getElementById('map'), {zoom: 15, center: location});
+// verify dropdown values
+function on_select_change() {
+    let start = Number(document.getElementById("start-time").value);
+    let end = Number(document.getElementById("end-time").value);
 
-    var image = 'images/car.png'; // TODO: Add image for car
-
-    // The marker, positioned at Daytona
-    var marker = new google.maps.Marker({position: location, map: map});
-
-    function move_car(lat, lng) {
-        marker.setPosition(new google.maps.LatLng(lat, lng));
+    if (start < end) {
+        document.getElementById("time-form").submit()
+    } else {
+        alert("Selected start time must be prior to selected end time");
     }
 
-    move_car(29.186839, -81.063373);
 }
 
-function update_map() {
-    // TODO: Get values from date selectors
+// map
+function draw_map() {
+    if(location_pairs === null) {
+        document.getElementById("map").style.display = 'none';
+        document.getElementById("no-info").style.display = 'inline';
+        return;
+    }
 
+    // location_pairs: [[lat0, lon0], [lat1, lon1], ...] coordinates: [{lat: lat0, lng: lng0}, ...]
+    let coordinates = pairs_to_coordinates(location_pairs);
 
-    // Get values from time selectors
-    var start_time = document.getElementById("start-time").value;
-    var end_time = document.getElementById("end-time").value;
+    // initialize the map
+    let map = new google.maps.Map(document.getElementById('map'), {center: coordinates[0]});
 
-    start_time = start_time * 3600; // convert hours into seconds after t=0
-    end_time = end_time * 3600;
+    // place markers at start and end of data, drawing lines to show car movement in between
+    let startmarker = make_marker(coordinates[0], map);
+    startmarker.setTitle("Start");
+    startmarker.setLabel("S");
 
-    console.log(start_time);
-    console.log(end_time);
+    let endmarker = make_marker(coordinates[coordinates.length-1], map);
+    endmarker.setTitle("End");
+    endmarker.setLabel("E");
 
-    // TODO: convert time values into seconds
+    let carpath = new google.maps.Polyline({path: coordinates,
+                                            strokeColor: "#2803fc",
+                                            strokeOpacity: 1.0,
+                                            strokeWeight: 2,
+                                            map: map});
 
-    // TODO: retrieve long and lat pairs from fb using time/date
+    // zoom to a level that covers coordinates
+    let bounds = new google.maps.LatLngBounds();
+    for(let i=0; i < coordinates.length; i++) {
+        bounds.extend(coordinates[i]);
+    }
+    map.fitBounds(bounds);
+}
 
-    // TODO: put markers on all long and lat pairs
+function make_marker(coordinate, map) {
+    return new google.maps.Marker({position: coordinate, map: map});
+}
 
-    // TODO: draw lines between consecutive markers
+function pairs_to_coordinates(pairs) {
+    let coordinates = [];
+    for(let i=0; i < pairs.length; i++) {
+        coordinates.push({lat: pairs[i][0], lng: pairs[i][1]});
+    }
+    console.log(coordinates)
+    return coordinates;
 }
