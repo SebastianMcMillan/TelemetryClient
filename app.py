@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 
-from flask import Flask, render_template, request
-from datetime import datetime, timedelta
-
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
-
 import json
 from collections import OrderedDict
+from datetime import datetime, timedelta
+from random import randint  # For generating test data
 
-import numpy as np # For downsampling
-from random import randint # For generating test data
+import firebase_admin
+import numpy as np  # For downsampling
+from firebase_admin import credentials
+from firebase_admin import firestore
+from flask import Flask, render_template, request
 
 from google_maps_key import key
 
-MAX_POINTS = 500 # Min/max downsample data to this amount if larger
+MAX_POINTS = 500  # Min/max downsample data to this amount if larger
 
 CLIENT_FORMAT_FILE = "client_format.json"
 DATABASE_FORMAT_FILE = "database_format.json"
@@ -35,24 +33,25 @@ with open(CLIENT_FORMAT_FILE) as file_handle:
 with open(DATABASE_FORMAT_FILE) as file_handle:
 	db_format = json.load(file_handle)
 
+
 @app.route('/', methods=['GET'])
 def index():
 	return render_template('index.html')
 
+
+# TODO: Endpoint for AJAX requests to update data on realtime page
 @app.route('/realtime', methods=['GET'])
 def realtime():
 	return "NYI"
-	#return render_template('realtime.html', data=data)
+	# return render_template('realtime.html', data=data)
 
-# TODO: Endpoint for AJAX requests to update data on realtime page
 
 @app.route('/daily', methods=['GET'])
 def daily():
+	# Check if valid date was provided as GET parameter, default to today (at midnight) if not
 	try:
-		# Check if valid date was provided as GET parameter
 		date = datetime.strptime(request.args.get('date', default=""), '%Y-%m-%d')
 	except ValueError:
-		# Default to today (at midnight) if not
 		date = datetime.combine(datetime.today(), datetime.min.time())
 
 	# Formatted date strings when rendering page and buttons to other dates
@@ -62,43 +61,44 @@ def daily():
 
 	tab_list = client_format.keys()
 
-	# Try to get tab from GET parameter. If not provided or invalid, default to first tab.
+	# Check if valid tab was provided as GET parameter, default to default to first tab if not
 	try:
 		tab = request.args.get('tab')
 		if not tab in client_format.keys(): raise ValueError()
 	except ValueError:
 		tab = next(iter(client_format))
 
-	graph_data = OrderedDict() # The data used in the render template (see format below)
+	graph_data = OrderedDict()  # The data used in the render template (see format below)
 
 	if tab == "Location":  # Location tab uses separate template to display map
-	  	# url to initialize Google Maps API, to be injected into HTML. key value from local google_maps_key.py file
+		# URL to initialize Google Maps API, to be injected into HTML. Key: value is from local google_maps_key.py file.
 		maps_url = key
 
+		# Check if valid times were provided as GET parameter, default to all day if not
 		try:
-			# the times, in seconds from 0 on the day, for which to display data
+			# Times are represented by seconds from midnight
 			starttime = int(request.args.get('starttime', default=''))
 			endtime = int(request.args.get('endtime', default=''))
 		except ValueError:
-			# default to whole day if not provided by GET parameter
 			starttime = 0
 			endtime = 86400
 
-		# get list of latitudes; lat_gen is a generator of document snapshots, but will only yield one snapshot
-		# with how the database is currently set up
+		# Get list of latitudes. lat_gen is a generator of document snapshots, but will only yield one snapshot for us
+		# given the firebase setup.
 		lat_gen = db.collection(DATABASE_COLLECTION).document(date_str).collection('gps_lat').stream()
 
-		# avoid throwing an error if there's no data for the day (lat_gen will yield no values)
+		# Avoid a server error if there's no data for the day (lat_gen yields no values)
 		try:
-			lat_reading_dict = next(lat_gen).to_dict()["seconds"]  # reading_dict format: {'second': reading}, ex. {'10': 334}
+			lat_reading_dict = next(lat_gen).to_dict()["seconds"]  # dict format: {'second': reading}, ex. {'10': 334}
 		except StopIteration:
 			location_pairs = None
 			return render_template('daily_location.html', **locals())
 
-		lat_reading_list = sorted({int(k): v for k, v in lat_reading_dict.items() if starttime <= int(k) <= endtime}.items())
+		lat_reading_list = \
+			sorted({int(k): v for k, v in lat_reading_dict.items() if starttime <= int(k) <= endtime}.items())
 		sec_list, lat_list = zip(*lat_reading_list)
 
-		# get list of longitudes
+		# Get list of longitudes in the same manner
 		lon_gen = db.collection(DATABASE_COLLECTION).document(date_str).collection('gps_lon').stream()
 
 		try:
@@ -107,7 +107,8 @@ def daily():
 			location_pairs = None
 			return render_template('daily_location.html', **locals())
 
-		lon_reading_list = sorted({int(k): v for k, v in lon_reading_dict.items() if starttime <= int(k) <= endtime}.items())
+		lon_reading_list = \
+			sorted({int(k): v for k, v in lon_reading_dict.items() if starttime <= int(k) <= endtime}.items())
 		sec_list, lon_list = zip(*lon_reading_list)
 
 		location_pairs = zip(lat_list, lon_list)  # [(lat0, lon0), (lat1, lon1), ...]
@@ -146,6 +147,7 @@ def daily():
 
 		return render_template('daily.html', **locals())
 
+
 # https://stackoverflow.com/questions/10847660/subsampling-averaging-over-a-numpy-array
 def avg_downsample(x, y, num_bins):
 	pts_per_bin = x.size // num_bins
@@ -155,25 +157,29 @@ def avg_downsample(x, y, num_bins):
 	y_avgs = np.round(y_avgs, 2)
 	return x_avgs, y_avgs
 
-# Currently not being used, but left as an option for the future
+
+# A different downsampling method. This is currently not being used, but left as an option for the future
 # https://stackoverflow.com/questions/54449631/improve-min-max-downsampling
 def min_max_downsample(x, y, num_bins):
-    pts_per_bin = x.size // num_bins
+	pts_per_bin = x.size // num_bins
 
-    x_view = x[:pts_per_bin*num_bins].reshape(num_bins, pts_per_bin)
-    y_view = y[:pts_per_bin*num_bins].reshape(num_bins, pts_per_bin)
-    i_min = np.argmin(y_view, axis=1)
-    i_max = np.argmax(y_view, axis=1)
+	x_view = x[:pts_per_bin*num_bins].reshape(num_bins, pts_per_bin)
+	y_view = y[:pts_per_bin*num_bins].reshape(num_bins, pts_per_bin)
+	i_min = np.argmin(y_view, axis=1)
+	i_max = np.argmax(y_view, axis=1)
 
-    r_index = np.repeat(np.arange(num_bins), 2)
-    c_index = np.sort(np.stack((i_min, i_max), axis=1)).ravel()
+	r_index = np.repeat(np.arange(num_bins), 2)
+	c_index = np.sort(np.stack((i_min, i_max), axis=1)).ravel()
 
-    return x_view[r_index, c_index], y_view[r_index, c_index]
+	return x_view[r_index, c_index], y_view[r_index, c_index]
+
 
 @app.route('/longterm', methods=['GET'])
 def longterm():
 	return "NYI"
 
+
+# Throwaway test endpoint
 @app.route('/generate-dummy-data', methods=['GET'])
 def dummy():
 	try:
@@ -191,7 +197,8 @@ def dummy():
 	except StopIteration: # This means its safe to generate data (without overwriting)
 		pass
 
-	TEST_SENSORS = {"battery_voltage": [300, 400], "battery_current": [200, 500], "bms_fault": [0, 1], "battery_level": [60, 70]};
+	TEST_SENSORS = \
+		{"battery_voltage": [300, 400], "battery_current": [200, 500], "bms_fault": [0, 1], "battery_level": [60, 70]}
 	date_doc = db.collection(DATABASE_COLLECTION).document(date_str)
 
 	for sensor, rand_range in TEST_SENSORS.items():
@@ -203,5 +210,6 @@ def dummy():
 
 	return "OK"
 
+
 if __name__ == '__main__':
-    app.run()
+	app.run()
