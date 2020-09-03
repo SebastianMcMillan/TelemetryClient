@@ -1,7 +1,9 @@
 * { box-sizing: border-box; }
+
 body {
 	text-align: center;
 }
+
 #bg {
 	position: absolute;
 	top: 0;
@@ -12,11 +14,13 @@ body {
 	opacity: 0.2;
 	background: url(/static/images/background.jpg) center/cover no-repeat;
 }
+
 #data {
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
 }
+
 fieldset {
 	font-family: sans-serif;
 	display: inline-block;
@@ -24,6 +28,7 @@ fieldset {
 	border-radius: 6px;
 	padding-left: 1em;
 }
+
 legend {
 	font-size: 14pt;
 }

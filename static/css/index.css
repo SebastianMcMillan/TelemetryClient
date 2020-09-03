@@ -1,0 +1,17 @@
+#content {
+    display: inline-block;
+    background: white;
+    border: 1px solid black;
+    border-radius: 4px;
+    margin-top: 16px;
+}
+
+h1 {
+    margin: 16px;
+}
+
+a {
+    display: block;
+    font-size: 20px;
+    margin: 16px;
+}
