@@ -39,11 +39,10 @@ def index():
     return render_template('index.html')
 
 
-# TODO: Endpoint for AJAX requests to update data on realtime page
+# TODO: Javascript
 @app.route('/realtime', methods=['GET'])
 def realtime():
-    return "NYI"
-    # return render_template('realtime.html', data=data)
+    return render_template('realtime.html', data=data)
 
 
 @app.route('/daily', methods=['GET'])
