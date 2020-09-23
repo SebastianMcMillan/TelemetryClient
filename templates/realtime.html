@@ -3,19 +3,27 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>KU Solar Car Telemetry</title>
-		<link rel="stylesheet" type="text/css" href="static/css/style.css">
+		<link rel="stylesheet" type="text/css" href="static/css/realtime.css">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 	<body>
-		<div id="data">
-		{% for source, sensors in data.items() %}
-		<fieldset>
-			<legend>{{source}}</legend>
-			{% for sensor, properties in sensors.items() %}
-				{{sensor}}: {{properties[1]}}{{properties[0]}}<br>
-			{% endfor %}
-		</fieldset>
-		{% endfor %}
-		</div>
+    <div id="bg"></div>
+    <div id="content">
+        <div id="top">
+            <div id="top-center">
+                <h2>Real Time</h2>
+            </div>
+        </div>
+        <div id="main">
+            <div class="main-box">
+                <h4>main-first div</h4>
+                <h3>For the grids</h3>
+            </div>
+            <div class="main-box">
+                <h4>main-second div</h4>
+                <h3>For the map</h3>
+            </div>
+        </div>
+    </div>
 	</body>
 </html>

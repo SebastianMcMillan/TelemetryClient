@@ -42,7 +42,7 @@ def index():
 # TODO: Javascript
 @app.route('/realtime', methods=['GET'])
 def realtime():
-    return render_template('realtime.html', data=data)
+    return render_template('realtime.html')
 
 
 @app.route('/daily', methods=['GET'])

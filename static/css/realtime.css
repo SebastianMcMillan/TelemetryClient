@@ -1,0 +1,47 @@
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+#bg {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: -100;
+	opacity: 0.2;
+	background: url(/static/images/background.jpg) center/cover no-repeat;
+}
+
+#content {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-content: stretch;
+}
+
+#top {
+    flex: 0 2 100px;
+    text-align: center;
+}
+
+#main {
+    flex: 1 1 auto;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    align-items: stretch;
+}
+
+.main-box {
+    flex: 1 1 auto;
+    min-width: 400px;
+
+    /* remove */
+    text-align: center;
+
+    /* style for grids goes here */
+
+}
