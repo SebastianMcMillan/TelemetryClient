@@ -12,6 +12,9 @@
 	</head>
 	<body>
 		<div id="bg"></div>
+        <div class="home-button">
+            <a href=".">HOME</a>
+        </div>
 		<div id="date-changer">
 			<form><input type="hidden" name="tab" value="{{tab}}"><button type="submit" name="date" value="{{prev_date_str}}">&#9668;</button></form>
 			<form><input type="hidden" name="tab" value="{{tab}}"><input type="date" name="date" value="{{date_str}}" oninput="this.form.submit()"></form>
