@@ -60,3 +60,19 @@ body {
     border: 1px solid black;
     border-radius: 4px;
 }
+
+#map {
+    width: 99%;
+    margin: auto;
+    height: 95%;
+}
+
+#no-info {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 15px;
+    display: none;
+    border-style: solid;
+    border-width: thin;
+    border-radius: 5px;
+}
