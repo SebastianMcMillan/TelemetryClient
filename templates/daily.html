@@ -30,6 +30,14 @@
 			{% endfor %}
 		</div>
 		<div id="graph-container">
+=======
+{% extends "layout.html" %}
+{% block head %}
+	{{ super() }}
+{% endblock %}
+{% block body %}
+	<div id="graph-container">
+>>>>>>> 29d48d9f8e477d9023bc806afd9fa719fa687f98
 			<div class="graph" id="{{graph}}"> 
 				<canvas id="chart-{{graph}}"></canvas>
 				<script type="text/javascript">
@@ -70,5 +78,4 @@
 				</script>
 			</div>
 		</div>
-	</body>
-</html>
+{% endblock %}
