@@ -8,7 +8,8 @@ body {
 
 div.home-button {
     position: fixed;
-    left: 25px;
+    top: 5px;
+    left: 5px;
 }
 
 div.home-button a {
@@ -21,7 +22,6 @@ background-color: white; /* Green */
   text-decoration: none;
   display: inline-block;
   font-size: 15px;
-    
 }
 
 #date-changer {
