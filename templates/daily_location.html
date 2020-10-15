@@ -1,13 +1,7 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="UTF-8">
-		<title>KU Solar Car Telemetry</title>
-		<link rel="stylesheet" type="text/css" href="../static/css/style.css">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" type="text/css" href="static/css/daily_location.css">
-		<script src="../static/javascript/lib/Moment.js"></script>
-		<script src="../static/javascript/lib/Chart.js"></script>
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+
         <script src="../static/javascript/daily_location.js"></script>
 		<script type="text/javascript">
             // Declare Javascript variables and inject serverside values
@@ -18,33 +12,8 @@
             let starttime = {{ starttime }};
             let endtime = {{ endtime }};
 		</script>
-	</head>
-	<body>
-		<div id="bg"></div>
-        <div id="date-changer">
-            <form>
-                <input type="hidden" name="tab" value="{{tab}}">
-                <button type="submit" name="date" value="{{prev_date_str}}">&#9668;</button>
-            </form>
-            <form>
-                <input type="hidden" name="tab" value="{{tab}}">
-                <input type="date" name="date" value="{{date_str}}" oninput="this.form.submit()">
-            </form>
-            <form>
-                <input type="hidden" name="tab" value="{{tab}}">
-                <button type="submit" name="date" value="{{next_date_str}}">&#9658;</button>
-            </form>
-        </div>
-
-		<div id="tabs">
-			{% for tab_link in tab_list %}
-				<form>
-					<input type="hidden" name="date" value="{{date_str}}">
-					<button type="submit" name="tab" class="tab{% if tab_link == tab %} active{% endif %}" value="{{tab_link}}">{{tab_link}}</button>
-				</form>
-			{% endfor %}
-		</div>
-
+{% endblock %}
+{% block body %}
         <div style="height: 8px"></div>
         <div id="times">
             <form id="time-form">
@@ -120,5 +89,5 @@
 
         <!-- Initialize map, injecting URL containing API token -->
         <script src="{{ maps_url }}"></script>
-	</body>
-</html>
+{% endblock %}
+
