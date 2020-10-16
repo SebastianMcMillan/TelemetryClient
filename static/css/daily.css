@@ -12,7 +12,7 @@ div.home-button {
     left: 5px;
 }
 
-div.home-button a {
+.home-button a {
 background-color: white; /* Green */
   border: 2px solid black;
   border-radius: 12px;
