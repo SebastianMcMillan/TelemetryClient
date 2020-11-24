@@ -6,6 +6,24 @@ body {
     margin: 0;
 }
 
+div.home-button {
+    position: fixed;
+    top: 5px;
+    left: 5px;
+}
+
+.home-button a {
+background-color: white; /* Green */
+  border: 2px solid black;
+  border-radius: 12px;
+  color: black;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 15px;
+}
+
 #date-changer {
     margin: 8px 0 8px 0;
 }
