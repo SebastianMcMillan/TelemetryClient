@@ -175,7 +175,7 @@ def min_max_downsample(x, y, num_bins):
 
 @app.route('/longterm', methods=['GET'])
 def longterm():
-    return "NYI"
+    return render_template('longterm.html')
 
 
 # Throwaway test endpoint
