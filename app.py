@@ -126,7 +126,7 @@ def daily():
                 # Loop through all the sensor readings for the day being viewed
                 db_data = db.collection(DATABASE_COLLECTION).document(date_str).collection(sensor_id).stream()
                 try:
-                    readings = next(db_data).to_dict()["seconds"] # The map within the sensor's document
+                   readings = next(db_data).to_dict()["seconds"] # The map within the sensor's document
                 except StopIteration:
                     continue # Skip sensors not in database
 
