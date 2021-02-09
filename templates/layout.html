@@ -18,49 +18,32 @@
 		<nav class="navbar navbar-expand-lg navbar-light bg-light">
 				  <div class="" id="navbarSupportedContent">
 					  <ul class="navbar-nav mr-auto">
-						  <li class="nav-item active">
 							  <a class="navbar-brand" href="./">
 								  <img src="static/images/logo.png" width="80" alt="">
 							  </a>
 						  </li>
 						  <div class="d-flex align-items-center">
-						  <li class="nav-item active">
-							  <a class="nav-link" style="vertical-align:middle" href="daily">Daily</a>
+						  {% for nav_link in nav_list %}
+
+                        	<li class="nav-item{% if nav_link == nav %} active{% endif %}">
+							<a class="nav-link" href="{{nav_link}}">{{nav_link}}</a>
 
 						  </li>
 
-						  <li class="nav-item">
-
-							  <a class="nav-link" href="realtime">Realtime</a>
-						  </li>
-						  <li class="nav-item">
-							  <a class="nav-link" href="longterm">Longterm</a>
-						  </li>
+						  {% endfor %}
 						  </div>
 
-						  <div id="date-changer" style="position: absolute;
-						  		left: 50%;
-						  		transform:translateX(-50%);">
-							  <div class="input-group ml-4">
-								<form class="input-group-prepend"><button type="submit" class="btn btn-primary" name="date" value="{{prev_date_str}}">&#9668;</button><input type="hidden" name="tab" value="{{tab}}"></form>
-								<form><input type="hidden" name="tab" value="{{tab}}"><input type="date" class="form-control" name="date" value="{{date_str}}" oninput="this.form.submit()"></form>
-								<form class="input-group-append"><input type="hidden" name="tab" value="{{tab}}"><button type="submit" class="btn btn-primary" name="date" value="{{next_date_str}}">&#9658;</button></form>
-							  </div>
-						  </div>
+						  {% block date %}
+
+						  {% endblock %}
+
 					  </ul>
 				  </div>
 
 		</nav>
 		<div id="bg"></div>
 
-		<div id="tabs">
-			{% for tab_link in tab_list %}
-				<form>
-					<input type="hidden" name="date" value="{{date_str}}">
-					<button type="submit" name="tab" class="tab{% if tab_link == tab %} active{% endif %}" value="{{tab_link}}">{{tab_link}}</button>
-				</form>
-			{% endfor %}
-		</div>
+
 
 
 
