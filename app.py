@@ -25,6 +25,10 @@ db = firestore.client()
 
 app = Flask(__name__)
 
+NAV_LIST = ["daily", "realtime", "longterm"]
+
+
+
 # Determines what each tab/graph should display
 with open(CLIENT_FORMAT_FILE) as file_handle:
     client_format = json.load(file_handle)
@@ -42,11 +46,15 @@ def index():
 # TODO: Javascript
 @app.route('/realtime', methods=['GET'])
 def realtime():
-    return render_template('realtime.html')
+    nav_list = NAV_LIST
+    nav = "realtime"
+    return render_template('realtime.html', **locals())
 
 
 @app.route('/daily', methods=['GET'])
 def daily():
+    nav_list = NAV_LIST
+    nav = "daily"
     # Check if valid date was provided as GET parameter, default to today (at midnight) if not
     try:
         date = datetime.strptime(request.args.get('date', default=""), '%Y-%m-%d')
@@ -175,7 +183,9 @@ def min_max_downsample(x, y, num_bins):
 
 @app.route('/longterm', methods=['GET'])
 def longterm():
-    return render_template('longterm.html')
+    nav_list = NAV_LIST
+    nav = "longterm"
+    return render_template('longterm.html', **locals())
 
 
 # Throwaway test endpoint

@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "daily_layout.html" %}
 {% block head %}
     {{ super() }}
 
@@ -14,6 +14,7 @@
 		</script>
 {% endblock %}
 {% block body %}
+    {{ super() }}
         <div style="height: 8px"></div>
         <div id="times">
             <form id="time-form">
