@@ -1,8 +1,9 @@
-{% extends "layout.html" %}
+{% extends "daily_layout.html" %}
 {% block head %}
 	{{ super() }}
 {% endblock %}
 {% block body %}
+    {{ super() }}
 	<div id="graph-container">
 			<div class="graph" id="{{graph}}"> 
 				<canvas id="chart-{{graph}}"></canvas>
