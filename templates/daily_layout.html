@@ -17,12 +17,19 @@
 
 {% block body %}
 
-    <div id="tabs">
+            <ul class="nav nav-tabs mx-auto">
                 {% for tab_link in tab_list %}
+                <li class="nav-item">
                     <form>
+
                         <input type="hidden" name="date" value="{{date_str}}">
-                        <button type="submit" name="tab" class="tab{% if tab_link == tab %} active{% endif %}" value="{{tab_link}}">{{tab_link}}</button>
+
+                        <button type="submit" name="tab" class="nav-link{% if tab_link == tab %} active{% endif %}" value="{{tab_link}}">{{tab_link}}</button>
+
                     </form>
+
                 {% endfor %}
-            </div>
+            </ul>
+
+
 {% endblock %}
