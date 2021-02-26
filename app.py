@@ -25,7 +25,7 @@ db = firestore.client()
 
 app = Flask(__name__)
 
-NAV_LIST = ["daily", "realtime", "longterm"]
+NAV_LIST = ["Daily", "Realtime", "Longterm"]
 
 
 
@@ -44,17 +44,17 @@ def index():
 
 
 # TODO: Javascript
-@app.route('/realtime', methods=['GET'])
+@app.route('/Realtime', methods=['GET'])
 def realtime():
     nav_list = NAV_LIST
-    nav = "realtime"
+    nav = "Realtime"
     return render_template('realtime.html', **locals())
 
 
-@app.route('/daily', methods=['GET'])
+@app.route('/Daily', methods=['GET'])
 def daily():
     nav_list = NAV_LIST
-    nav = "daily"
+    nav = "Daily"
     # Check if valid date was provided as GET parameter, default to today (at midnight) if not
     try:
         date = datetime.strptime(request.args.get('date', default=""), '%Y-%m-%d')
@@ -181,10 +181,10 @@ def min_max_downsample(x, y, num_bins):
     return x_view[r_index, c_index], y_view[r_index, c_index]
 
 
-@app.route('/longterm', methods=['GET'])
+@app.route('/Longterm', methods=['GET'])
 def longterm():
     nav_list = NAV_LIST
-    nav = "longterm"
+    nav = "Longterm"
     return render_template('longterm.html', **locals())
 
 
