@@ -23,7 +23,7 @@ cred = credentials.Certificate("ku-solar-car-b87af-firebase-adminsdk-ttwuy-0945c
 firebase_admin.initialize_app(cred, {"projectId": "ku-solar-car-b87af"})
 db = firestore.client()
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 
 NAV_LIST = ["daily", "realtime", "longterm"]
 
@@ -127,6 +127,7 @@ def daily():
 
             # Find the info about the sensor
             sensor = db_format[sensor_id]
+
             # Ensure the sensor is in the database
             if sensor is not None and "name" in sensor:
                 graph_data[sensor["name"]] = OrderedDict()
@@ -134,9 +135,11 @@ def daily():
                 # Loop through all the sensor readings for the day being viewed
                 db_data = db.collection(DATABASE_COLLECTION).document(date_str).collection(sensor_id).stream()
                 try:
-                   readings = next(db_data).to_dict()["seconds"] # The map within the sensor's document
+                    readings = next(db_data).to_dict()["seconds"] # The map within the sensor's document
                 except StopIteration:
-                    continue # Skip sensors not in database
+                    continue  # Skip sensors not in database
+                except KeyError:
+                    continue
 
                 # Convert keys from strings to ints and sort (conversion required for sort to be correct)
                 sorted_readings = sorted({int(k) : v for k, v in readings.items()}.items())
@@ -218,6 +221,11 @@ def dummy():
         #print(dummy_data)
 
     return "OK"
+
+
+@app.route('/realtime/give-bool', methods=['GET'])
+def give_bool():
+    return str(randint(0, 1))
 
 
 if __name__ == '__main__':
