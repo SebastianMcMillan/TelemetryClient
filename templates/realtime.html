@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block head %}
 	{{ super() }}
+    
 {% endblock %}
 {% block body %}
 	<body>
@@ -9,8 +10,16 @@
         <h1 class="text-center">Realtime</h1>
     </div>
     <div class="container">
+
+        <!-- Top row for map -->
         <div class="row">
-            <div class="col-6" style="min-width: 500px; margin: auto">
+            <!--The div element for the map -->
+            <div id="map"></div>
+        </div>
+
+        <!-- Cards below -->
+        <div class="row">
+            <div class="col-4" style="min-width: 500px; margin: auto">
                 <div class="card">
                     <div id="head" class="card-header">
                         Value: x
@@ -20,23 +29,18 @@
                         <canvas id="canvas"></canvas>
                     </div>
                 </div>
-
-                <!--
-                <div style="width:100%; height: 100%">
-		            <canvas id="canvas"></canvas>
-                </div>
-                -->
-            <br>
-            <br>
             </div>
-
-            <div class="col-6" style="min-width: 500px; margin: auto">
-                <h1>Right col</h1>
-            </div>
-
+            <div class="col-4"></div>
+            <div class="col-4"></div>
         </div>
     </div>
 
     <script src="{{ url_for('static', filename='javascript/realtime.js') }}"></script>
+
+    <!-- Map script has to come down here-->
+    <script src="{{ url_for("static", filename="javascript/realtime_map.js") }}"></script>
+
+    <!-- Initialize map, injecting URL containing API token -->
+    <script src="{{ maps_url }}"></script>
 	</body>
 {% endblock %}

@@ -28,7 +28,6 @@ app = Flask(__name__, static_url_path='/static')
 NAV_LIST = ["daily", "realtime", "longterm"]
 
 
-
 # Determines what each tab/graph should display
 with open(CLIENT_FORMAT_FILE) as file_handle:
     client_format = json.load(file_handle)
@@ -43,12 +42,9 @@ def index():
     return render_template('index.html')
 
 
-# TODO: Javascript
 @app.route('/realtime', methods=['GET'])
 def realtime():
-    nav_list = NAV_LIST
-    nav = "realtime"
-    return render_template('realtime.html', **locals())
+    return render_template('realtime.html', maps_url=key)
 
 
 @app.route('/daily', methods=['GET'])
