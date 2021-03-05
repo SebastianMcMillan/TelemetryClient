@@ -25,7 +25,7 @@ db = firestore.client()
 
 app = Flask(__name__, static_url_path='/static')
 
-NAV_LIST = ["daily", "realtime", "longterm"]
+NAV_LIST = ["Daily", "Realtime", "Longterm"]
 
 
 # Determines what each tab/graph should display
@@ -44,7 +44,9 @@ def index():
 
 @app.route('/realtime', methods=['GET'])
 def realtime():
-    return render_template('realtime.html', maps_url=key, format=db_format)
+    nav_list = NAV_LIST
+    nav = "realtime"
+    return render_template('realtime.html', nav_list=nav_list, nav=nav, maps_url=key, format=db_format)
 
 
 @app.route('/daily', methods=['GET'])
