@@ -122,5 +122,5 @@ function updateChart() {
 
 function updateHead(new_val) {
 	let header = document.getElementById("head");
-	header.innerText = "Value: " + new_val;
+	// header.innerText = "Value: " + new_val;
 }

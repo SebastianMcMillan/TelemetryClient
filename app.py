@@ -44,7 +44,7 @@ def index():
 
 @app.route('/realtime', methods=['GET'])
 def realtime():
-    return render_template('realtime.html', maps_url=key)
+    return render_template('realtime.html', maps_url=key, format=db_format)
 
 
 @app.route('/daily', methods=['GET'])
