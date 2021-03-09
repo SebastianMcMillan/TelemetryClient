@@ -144,3 +144,9 @@ cython_debug/
 # Solar Car stuff
 google_maps_key.py
 ku-solar-car-b87af-firebase-adminsdk-ttwuy-0945c0ac44.json
+
+#Internal Testing
+body.json
+post.sh
+header.txt
+headerKey.json
