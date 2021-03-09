@@ -25,7 +25,7 @@ db = firestore.client()
 
 app = Flask(__name__)
 
-NAV_LIST = ["Daily", "Realtime", "Longterm"]
+NAV_LIST = ["Realtime", "Daily", "Longterm"]
 
 
 
