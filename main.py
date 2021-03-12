@@ -10,8 +10,8 @@ from random import randint  # For generating test data
 
 import firebase_admin
 import numpy as np  # For downsampling
-from firebase_admin import credentials
-from firebase_admin import firestore
+from firebase_admin import credentials, firestore, initialize_app
+
 from flask import Flask, render_template, jsonify, request
 
 from google_maps_key import key
@@ -364,4 +364,4 @@ def give_bool():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True, port=8080)

@@ -150,3 +150,5 @@ body.json
 post.sh
 header.txt
 headerKey.json
+key.json
+.gcloudignore
