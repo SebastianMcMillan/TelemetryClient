@@ -3,7 +3,7 @@
 	{{ super() }}
     <!-- Pass our format into javascript -->
     <script>
-        db_format = {{ format }}
+
     </script>
 {% endblock %}
 {% block body %}
@@ -30,7 +30,7 @@
                         </div>
 
                         <div class="card-body p-0">
-                            <canvas id="canvas-{{ datatype }}" style="height: 100%; width: 100%"></canvas>
+                            <canvas id="canvas-{{ datatype }}" class="can" style="height: 100%; width: 100%"></canvas>
                         </div>
                 </div>
             </div>

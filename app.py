@@ -3,13 +3,16 @@
 import json
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from random import randint  # For generating test data
+
+# For generating test data
+from random import randint, choices
+from time import time
 
 import firebase_admin
 import numpy as np  # For downsampling
 from firebase_admin import credentials
 from firebase_admin import firestore
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 
 from google_maps_key import key
 
@@ -224,6 +227,24 @@ def dummy():
 @app.route('/realtime/give-bool', methods=['GET'])
 def give_bool():
     return str(randint(0, 1))
+
+
+@app.route('/realtime/data', methods=['GET'])
+def data():
+    return jsonify(battery_voltage=randint(0, 5),
+                   battery_current=randint(15, 30),
+                   battery_temperature=randint(80, 120),
+                   bms_fault=choices([0, 1], weights=[.9, .1])[0],
+                   gps_time=int(time()),  # seconds since epoch
+                   gps_lat=None,
+                   gps_lon=None,
+                   gps_velocity_east=None,
+                   gps_velocity_north=None,
+                   gps_velocity_up=None,
+                   gps_speed=None,
+                   solar_voltage=randint(0, 5),
+                   solar_current=randint(15, 30),
+                   motor_speed=randint(15, 30))
 
 
 if __name__ == '__main__':
