@@ -107,14 +107,14 @@ def create():
 
 @app.route('/car', methods=['GET', 'POST'])
 def fromCar():
+    auth = request.headers['Authentication']
+    if auth != headerKey["Authentication"]:
+        return f"An Error Occured: Authentication Failed", 401
     global countdownToBufferClear
     if countdownToBufferClear.is_alive():
         countdownToBufferClear.cancel()
         countdownToBufferClear = Timer(60.0, writeToFireBase)
     countdownToBufferClear.start()
-    auth = request.headers['Authentication']
-    if auth != headerKey["Authentication"]:
-        return f"An Error Occured: Authentication Failed", 401
     now = datetime.now()
     req_body = request.get_json()
     nowInSeconds = round((now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds())
