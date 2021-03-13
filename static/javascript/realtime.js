@@ -16,9 +16,12 @@ function newDateString(ms) {
 }
 
 
-var color = Chart.helpers.color;
-var config = {
-    type: 'bar',
+let color = Chart.helpers.color;
+
+let canvases = Array.from(document.getElementsByClassName("can"));
+let contexts = canvases.map(x => x.getContext('2d'));
+let charts = contexts.map(x => new Chart(x, {
+    type: 'line',
     data: {
         datasets: [{
             backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
@@ -54,25 +57,15 @@ var config = {
                     display: true,
                     labelString: 'value'
                 },
-				ticks: {
-                	min: -1,
-					max: 1,
-				}
+                ticks: {
+                    beginAtZero: true,
+                }
             }]
         }
     }
-};
+}));
 
-let new_data_queue = [];
-let time_queue = [];
-
-window.onload = function() {
-    var ctx = document.getElementById('canvas').getContext('2d');
-    window.myLine = new Chart(ctx, config);
-
-    setInterval(checkForData, 1000);
-    setInterval(updateChart, 1000);
-};
+setInterval(checkForData, 2000);
 
 
 /*
@@ -80,12 +73,25 @@ Adds data to new_data_queue
  */
 function checkForData() {
     const http = new XMLHttpRequest();
-    const url = "http://127.0.0.1:5000/realtime/give-bool";
+    const url = "http://127.0.0.1:5000/realtime/data";
     http.open("GET", url);
     http.send();
 
     http.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
+            let data = JSON.parse(http.responseText);
+            console.log(data);
+            for (let key in data) {
+                for(let i = 0; i < charts.length; i++) {
+                    let chart = charts[i];
+                    let parsed_id = chart.canvas.id.split("-")[1];
+                    if(parsed_id === key) {
+                        //pushData(chart, 1000*parseInt(data["gps_time"]), parseInt(data[key]));
+                        updateChart(chart, [parseInt(data["gps_time"])], [parseInt(data[key])]);
+                    }
+                }
+            }
+            /*
             let bool = parseInt(http.responseText);
             if (bool) {
             	new_data_queue.push(1);
@@ -94,6 +100,7 @@ function checkForData() {
 			}
 
 			time_queue.push(newDateString(0));
+			*/
         }
     };
 }
@@ -102,9 +109,10 @@ function checkForData() {
 /*
 Updates chart with values from new_data_queue, then deletes values from new_data_queue
  */
-function updateChart() {
-	let data = config.data.datasets[0].data;
+function updateChart(chart, time_queue, new_data_queue) {
+	let data = chart.config.data.datasets[0].data;
 	for (let i=0; i < new_data_queue.length; i++) {
+	    console.log("length is ", new_data_queue.length);
 		if(data.length > 5) {
 			data.splice(0, 1);
 		}
@@ -114,13 +122,24 @@ function updateChart() {
 		});
 		time_queue.splice(i, 1);
 		new_data_queue.splice(i, 1);
-		window.myLine.update();
+		chart.update();
     }
-	updateHead(data[data.length-1].y)
+}
+
+/*
+Push data given chart data array, time int, and data int
+ */
+function pushData(c, time, data) {
+    let data_arr = c.config.data.datasets[0].data;
+    data_arr.push({
+        x: time,
+        y: data
+    });
+    c.update();
 }
 
 
-function updateHead(new_val) {
-	let header = document.getElementById("head");
+function updateHead(chart) {
+	// let header = document.getElementById("head");
 	// header.innerText = "Value: " + new_val;
 }
