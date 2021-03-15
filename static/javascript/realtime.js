@@ -9,13 +9,6 @@ window.chartColors = {
 };
 
 
-function newDateString(ms) {
-	let timestmp = Date.now()+ms;
-	let mom = moment(timestmp);
-    return mom.toDate();
-}
-
-
 let color = Chart.helpers.color;
 
 let canvases = Array.from(document.getElementsByClassName("can"));
@@ -124,6 +117,7 @@ function updateChart(chart, time_queue, new_data_queue) {
 		new_data_queue.splice(i, 1);
 		chart.update();
     }
+	updateHead(chart)
 }
 
 /*
@@ -140,6 +134,11 @@ function pushData(c, time, data) {
 
 
 function updateHead(chart) {
-	// let header = document.getElementById("head");
-	// header.innerText = "Value: " + new_val;
+    let latest_val = chart.config.data.datasets[0].data[chart.config.data.datasets[0].data.length-1];
+    let data_key = chart.canvas.id.split("-")[1];
+    let card_key = "card-" + data_key;
+
+    let card_elem = document.getElementById(card_key);
+    let header = card_elem.getElementById("head");
+	header.innerText = "Value: " + latest_val;
 }
