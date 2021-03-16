@@ -11,6 +11,9 @@ window.chartColors = {
 
 let color = Chart.helpers.color;
 
+/*
+Canvases hold contexts. Charts are created by passing a context and a config dict.
+ */
 let canvases = Array.from(document.getElementsByClassName("can"));
 let contexts = canvases.map(x => x.getContext('2d'));
 let charts = contexts.map(x => new Chart(x, {
@@ -62,7 +65,7 @@ setInterval(checkForData, 2000);
 
 
 /*
-Adds data to new_data_queue
+Requests new data and calls updateChart() with it.
  */
 function checkForData() {
     const http = new XMLHttpRequest();
@@ -73,7 +76,6 @@ function checkForData() {
     http.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             let data = JSON.parse(http.responseText);
-            console.log(data);
             for (let key in data) {
                 for(let i = 0; i < charts.length; i++) {
                     let chart = charts[i];
@@ -89,7 +91,7 @@ function checkForData() {
 
 
 /*
-Updates chart with values from new_data_queue, then deletes values from new_data_queue
+Updates chart with values with paired values from time_queue, new_data_queue
  */
 function updateChart(chart, time_queue, new_data_queue) {
 	let data = chart.config.data.datasets[0].data;
@@ -110,6 +112,9 @@ function updateChart(chart, time_queue, new_data_queue) {
 }
 
 
+/*
+Update text at card head with the latest received value. Called from updateChart().
+ */
 function updateHead(chart) {
     let latest_val = chart.config.data.datasets[0].data[chart.config.data.datasets[0].data.length-1].y;
     let data_key = chart.canvas.id.split("-")[1];
