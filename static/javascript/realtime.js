@@ -9,13 +9,6 @@ window.chartColors = {
 };
 
 
-function newDateString(ms) {
-	let timestmp = Date.now()+ms;
-	let mom = moment(timestmp);
-    return mom.toDate();
-}
-
-
 let color = Chart.helpers.color;
 
 let canvases = Array.from(document.getElementsByClassName("can"));
@@ -86,21 +79,10 @@ function checkForData() {
                     let chart = charts[i];
                     let parsed_id = chart.canvas.id.split("-")[1];
                     if(parsed_id === key) {
-                        //pushData(chart, 1000*parseInt(data["gps_time"]), parseInt(data[key]));
-                        updateChart(chart, [parseInt(data["gps_time"])], [parseInt(data[key])]);
+                        updateChart(chart, [1000*parseInt(data["gps_time"])], [parseInt(data[key])]);
                     }
                 }
             }
-            /*
-            let bool = parseInt(http.responseText);
-            if (bool) {
-            	new_data_queue.push(1);
-			} else {
-            	new_data_queue.push(-1);
-			}
-
-			time_queue.push(newDateString(0));
-			*/
         }
     };
 }
@@ -124,22 +106,15 @@ function updateChart(chart, time_queue, new_data_queue) {
 		new_data_queue.splice(i, 1);
 		chart.update();
     }
-}
-
-/*
-Push data given chart data array, time int, and data int
- */
-function pushData(c, time, data) {
-    let data_arr = c.config.data.datasets[0].data;
-    data_arr.push({
-        x: time,
-        y: data
-    });
-    c.update();
+	updateHead(chart)
 }
 
 
 function updateHead(chart) {
-	// let header = document.getElementById("head");
-	// header.innerText = "Value: " + new_val;
+    let latest_val = chart.config.data.datasets[0].data[chart.config.data.datasets[0].data.length-1].y;
+    let data_key = chart.canvas.id.split("-")[1];
+    let head_key = "head-" + data_key;
+
+    let header = document.getElementById(head_key);
+	header.innerText = header.innerText.split(':')[0] +  ": " + latest_val;
 }

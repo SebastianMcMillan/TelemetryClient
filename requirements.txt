@@ -17,6 +17,7 @@ google-crc32c==1.0.0
 google-resumable-media==1.0.0
 googleapis-common-protos==1.52.0
 grpcio==1.35.0
+gunicorn
 httplib2==0.19.0
 idna==2.10
 itsdangerous==1.1.0
@@ -28,6 +29,7 @@ protobuf==3.13.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.20
+pyrebase
 pytz==2020.1
 requests==2.24.0
 rsa==4.6
