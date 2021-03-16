@@ -52,14 +52,6 @@ with open(DATABASE_FORMAT_FILE) as file_handle:
     db_format = json.load(file_handle)
 
 
-def file_size(file_path):
-    """
-    this function will return the file size
-    """
-    if os.path.isfile(file_path):
-        return os.stat(file_path)
-
-
 def writeToFireBase():
     """
     This function will write to Firebase with the given buffer.
@@ -79,11 +71,6 @@ def writeToFireBase():
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         print(exc_type, fname, exc_tb.tb_lineno)
         print(e)
-        
-
-countdownToBufferClear = Timer(60.0, writeToFireBase)
-
-
 
 
 def create():
@@ -105,7 +92,7 @@ def create():
     return "Document already exists", 200
 
 
-@app.route('/car', methods=['GET', 'POST'])
+@app.route('/car', methods=['POST'])
 def fromCar():
     auth = request.headers['Authentication']
     if auth != headerKey["Authentication"]:
