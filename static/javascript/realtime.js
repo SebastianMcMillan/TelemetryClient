@@ -134,11 +134,10 @@ function pushData(c, time, data) {
 
 
 function updateHead(chart) {
-    let latest_val = chart.config.data.datasets[0].data[chart.config.data.datasets[0].data.length-1];
+    let latest_val = chart.config.data.datasets[0].data[chart.config.data.datasets[0].data.length-1].y;
     let data_key = chart.canvas.id.split("-")[1];
-    let card_key = "card-" + data_key;
+    let head_key = "head-" + data_key;
 
-    let card_elem = document.getElementById(card_key);
-    let header = card_elem.getElementById("head");
-	header.innerText = "Value: " + latest_val;
+    let header = document.getElementById(head_key);
+	header.innerText = header.innerText.split(':')[0] +  ": " + latest_val;
 }
