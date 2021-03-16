@@ -3,13 +3,16 @@
 import json
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from random import randint  # For generating test data
+
+# For generating test data
+from random import randint, choices
+from time import time
 
 import firebase_admin
 import numpy as np  # For downsampling
 from firebase_admin import credentials
 from firebase_admin import firestore
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 
 from google_maps_key import key
 
@@ -23,10 +26,9 @@ cred = credentials.Certificate("ku-solar-car-b87af-firebase-adminsdk-ttwuy-0945c
 firebase_admin.initialize_app(cred, {"projectId": "ku-solar-car-b87af"})
 db = firestore.client()
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 
 NAV_LIST = ["Realtime", "Daily", "Longterm"]
-
 
 
 # Determines what each tab/graph should display
@@ -43,18 +45,17 @@ def index():
     return render_template('index.html')
 
 
-# TODO: Javascript
-@app.route('/Realtime', methods=['GET'])
+@app.route('/realtime', methods=['GET'])
 def realtime():
     nav_list = NAV_LIST
-    nav = "Realtime"
-    return render_template('realtime.html', **locals())
+    nav = "realtime"
+    return render_template('realtime.html', nav_list=nav_list, nav=nav, maps_url=key, format=db_format)
 
 
-@app.route('/Daily', methods=['GET'])
+@app.route('/daily', methods=['GET'])
 def daily():
     nav_list = NAV_LIST
-    nav = "Daily"
+    nav = "daily"
     # Check if valid date was provided as GET parameter, default to today (at midnight) if not
     try:
         date = datetime.strptime(request.args.get('date', default=""), '%Y-%m-%d')
@@ -127,6 +128,7 @@ def daily():
 
             # Find the info about the sensor
             sensor = db_format[sensor_id]
+
             # Ensure the sensor is in the database
             if sensor is not None and "name" in sensor:
                 graph_data[sensor["name"]] = OrderedDict()
@@ -134,9 +136,11 @@ def daily():
                 # Loop through all the sensor readings for the day being viewed
                 db_data = db.collection(DATABASE_COLLECTION).document(date_str).collection(sensor_id).stream()
                 try:
-                   readings = next(db_data).to_dict()["seconds"] # The map within the sensor's document
+                    readings = next(db_data).to_dict()["seconds"] # The map within the sensor's document
                 except StopIteration:
-                    continue # Skip sensors not in database
+                    continue  # Skip sensors not in database
+                except KeyError:
+                    continue
 
                 # Convert keys from strings to ints and sort (conversion required for sort to be correct)
                 sorted_readings = sorted({int(k) : v for k, v in readings.items()}.items())
@@ -181,10 +185,10 @@ def min_max_downsample(x, y, num_bins):
     return x_view[r_index, c_index], y_view[r_index, c_index]
 
 
-@app.route('/Longterm', methods=['GET'])
+@app.route('/longterm', methods=['GET'])
 def longterm():
     nav_list = NAV_LIST
-    nav = "Longterm"
+    nav = "longterm"
     return render_template('longterm.html', **locals())
 
 
@@ -218,6 +222,29 @@ def dummy():
         #print(dummy_data)
 
     return "OK"
+
+
+@app.route('/realtime/give-bool', methods=['GET'])
+def give_bool():
+    return str(randint(0, 1))
+
+
+@app.route('/realtime/data', methods=['GET'])
+def data():
+    return jsonify(battery_voltage=randint(0, 5),
+                   battery_current=randint(15, 30),
+                   battery_temperature=randint(80, 120),
+                   bms_fault=choices([0, 1], weights=[.9, .1])[0],
+                   gps_time=int(time()),  # seconds since epoch
+                   gps_lat=None,
+                   gps_lon=None,
+                   gps_velocity_east=None,
+                   gps_velocity_north=None,
+                   gps_velocity_up=None,
+                   gps_speed=None,
+                   solar_voltage=randint(0, 5),
+                   solar_current=randint(15, 30),
+                   motor_speed=randint(15, 30))
 
 
 if __name__ == '__main__':

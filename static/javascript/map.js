@@ -72,6 +72,6 @@ function pairs_to_coordinates(pairs) {
     for(let i=0; i < pairs.length; i++) {
         coordinates.push({lat: pairs[i][0], lng: pairs[i][1]});
     }
-    console.log(coordinates)
+    console.log(coordinates);
     return coordinates;
 }

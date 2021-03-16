@@ -53,7 +53,9 @@
 		"unit": " kn"
 	},
 	"solar_voltage": {
-		"category": "mppt"
+		"category": "mppt",
+		"name": "Input voltage (from solar)",
+		"unit": " V"
 	},
 	"solar_current": {
 		"category": "mppt",
