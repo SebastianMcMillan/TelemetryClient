@@ -79,21 +79,10 @@ function checkForData() {
                     let chart = charts[i];
                     let parsed_id = chart.canvas.id.split("-")[1];
                     if(parsed_id === key) {
-                        //pushData(chart, 1000*parseInt(data["gps_time"]), parseInt(data[key]));
                         updateChart(chart, [1000*parseInt(data["gps_time"])], [parseInt(data[key])]);
                     }
                 }
             }
-            /*
-            let bool = parseInt(http.responseText);
-            if (bool) {
-            	new_data_queue.push(1);
-			} else {
-            	new_data_queue.push(-1);
-			}
-
-			time_queue.push(newDateString(0));
-			*/
         }
     };
 }
@@ -118,18 +107,6 @@ function updateChart(chart, time_queue, new_data_queue) {
 		chart.update();
     }
 	updateHead(chart)
-}
-
-/*
-Push data given chart data array, time int, and data int
- */
-function pushData(c, time, data) {
-    let data_arr = c.config.data.datasets[0].data;
-    data_arr.push({
-        x: time,
-        y: data
-    });
-    c.update();
 }
 
 
