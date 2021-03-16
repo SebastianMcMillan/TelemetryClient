@@ -39,7 +39,7 @@ app = Flask(__name__, static_url_path='/static')
 SENSORS = ["battery_current", "battery_temperature", "battery_voltage", "bms_fault", "gps_lat","gps_lon", "gps_speed", "gps_time",
 "gps_velocity_east", "gps_velocity_north", "gps_velocity_up", "motor_speed", "solar_current", "solar_voltage"]
 
-NAV_LIST = ["Realtime", "Daily", "Longterm"]
+NAV_LIST = ["realtime", "daily", "longterm"]
 
 # Determines what each tab/graph should display
 with open(CLIENT_FORMAT_FILE) as file_handle:
@@ -164,17 +164,17 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/Realtime', methods=['GET'])
+@app.route('/realtime', methods=['GET'])
 def realtime():
     nav_list = NAV_LIST
-    nav = "Realtime"
+    nav = "realtime"
     return render_template('realtime.html', nav_list=nav_list, nav=nav, maps_url=key, format=db_format)
 
 
-@app.route('/Daily', methods=['GET'])
+@app.route('/daily', methods=['GET'])
 def daily():
     nav_list = NAV_LIST
-    nav = "Daily"
+    nav = "daily"
     # Check if valid date was provided as GET parameter, default to today (at midnight) if not
     try:
         date = datetime.strptime(request.args.get('date', default=""), '%Y-%m-%d')
@@ -304,10 +304,10 @@ def min_max_downsample(x, y, num_bins):
     return x_view[r_index, c_index], y_view[r_index, c_index]
 
 
-@app.route('/Longterm', methods=['GET'])
+@app.route('/longterm', methods=['GET'])
 def longterm():
     nav_list = NAV_LIST
-    nav = "Longterm"
+    nav = "longterm"
     return render_template('longterm.html', **locals())
 
 
