@@ -39,9 +39,7 @@ app = Flask(__name__, static_url_path='/static')
 SENSORS = ["battery_current", "battery_temperature", "battery_voltage", "bms_fault", "gps_lat","gps_lon", "gps_speed", "gps_time",
 "gps_velocity_east", "gps_velocity_north", "gps_velocity_up", "motor_speed", "solar_current", "solar_voltage"]
 
-NAV_LIST = ["Daily", "Realtime", "Longterm"]
-
-
+NAV_LIST = ["Realtime", "Daily", "Longterm"]
 
 # Determines what each tab/graph should display
 with open(CLIENT_FORMAT_FILE) as file_handle:
@@ -166,18 +164,17 @@ def index():
     return render_template('index.html')
 
 
-# TODO: Javascript
-@app.route('/Realtime', methods=['GET'])
+@app.route('/realtime', methods=['GET'])
 def realtime():
     nav_list = NAV_LIST
-    nav = "Realtime"
-    return render_template('realtime.html', **locals())
+    nav = "realtime"
+    return render_template('realtime.html', nav_list=nav_list, nav=nav, maps_url=key, format=db_format)
 
 
-@app.route('/Daily', methods=['GET'])
+@app.route('/daily', methods=['GET'])
 def daily():
     nav_list = NAV_LIST
-    nav = "Daily"
+    nav = "daily"
     # Check if valid date was provided as GET parameter, default to today (at midnight) if not
     try:
         date = datetime.strptime(request.args.get('date', default=""), '%Y-%m-%d')
@@ -307,10 +304,10 @@ def min_max_downsample(x, y, num_bins):
     return x_view[r_index, c_index], y_view[r_index, c_index]
 
 
-@app.route('/Longterm', methods=['GET'])
+@app.route('/longterm', methods=['GET'])
 def longterm():
     nav_list = NAV_LIST
-    nav = "Longterm"
+    nav = "longterm"
     return render_template('longterm.html', **locals())
 
 
@@ -349,6 +346,24 @@ def dummy():
 @app.route('/realtime/give-bool', methods=['GET'])
 def give_bool():
     return str(randint(0, 1))
+
+
+@app.route('/realtime/data', methods=['GET'])
+def data():
+    return jsonify(battery_voltage=randint(0, 5),
+                   battery_current=randint(15, 30),
+                   battery_temperature=randint(80, 120),
+                   bms_fault=choices([0, 1], weights=[.9, .1])[0],
+                   gps_time=int(time()),  # seconds since epoch
+                   gps_lat=None,
+                   gps_lon=None,
+                   gps_velocity_east=None,
+                   gps_velocity_north=None,
+                   gps_velocity_up=None,
+                   gps_speed=None,
+                   solar_voltage=randint(0, 5),
+                   solar_current=randint(15, 30),
+                   motor_speed=randint(15, 30))
 
 
 if __name__ == '__main__':
