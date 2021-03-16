@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-
+import os
 import json
 from collections import OrderedDict
-from datetime import datetime, timedelta
-
-# For generating test data
-from random import randint, choices
-from time import time
+from threading import Timer
+from datetime import datetime, timedelta, date
+import time
+import sys
+from random import randint  # For generating test data
 
 import firebase_admin
 import numpy as np  # For downsampling
-from firebase_admin import credentials
-from firebase_admin import firestore
-from flask import Flask, render_template, request, jsonify
+from firebase_admin import credentials, firestore, initialize_app
+
+from flask import Flask, render_template, jsonify, request
 
 from google_maps_key import key
 
@@ -23,13 +23,23 @@ DATABASE_FORMAT_FILE = "database_format.json"
 DATABASE_COLLECTION = "telemetry"
 
 cred = credentials.Certificate("ku-solar-car-b87af-firebase-adminsdk-ttwuy-0945c0ac44.json")
+f = open('headerKey.json', 'r')
+headerKey = json.load(f)
 firebase_admin.initialize_app(cred, {"projectId": "ku-solar-car-b87af"})
 db = firestore.client()
+COL_TELEMETRY = db.collection('telemetry')
+buffer = dict()
+lastRead = dict()
+
+dateTimeObj = datetime.now()
+timestampStr = dateTimeObj.strftime("%Y-%m-%d")
 
 app = Flask(__name__, static_url_path='/static')
 
-NAV_LIST = ["Realtime", "Daily", "Longterm"]
+SENSORS = ["battery_current", "battery_temperature", "battery_voltage", "bms_fault", "gps_lat","gps_lon", "gps_speed", "gps_time",
+"gps_velocity_east", "gps_velocity_north", "gps_velocity_up", "motor_speed", "solar_current", "solar_voltage"]
 
+NAV_LIST = ["Realtime", "Daily", "Longterm"]
 
 # Determines what each tab/graph should display
 with open(CLIENT_FORMAT_FILE) as file_handle:
@@ -39,6 +49,115 @@ with open(CLIENT_FORMAT_FILE) as file_handle:
 with open(DATABASE_FORMAT_FILE) as file_handle:
     db_format = json.load(file_handle)
 
+
+def writeToFireBase():
+    """
+    This function will write to Firebase with the given buffer.
+    """
+    try:
+        collections = COL_TELEMETRY.document(timestampStr).collections()
+        for col, sensor in zip(collections, SENSORS):
+            for sec in buffer.keys():
+                data_per_timeframe = int(buffer[sec][sensor])
+                col.document("0").update({
+                    str(sec) : data_per_timeframe
+                })
+        buffer.clear()
+        print("Buffer clear")
+    except Exception as e:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print(exc_type, fname, exc_tb.tb_lineno)
+        print(e)
+
+
+def create():
+    """
+        create() : Add document to Firestore collection with request body
+        Ensure you pass a custom ID as part of json body in post request
+        e.g. json={'id': '1', 'title': 'Write a blog post'}
+    """
+    dateTimeObj = datetime.now()
+    timestampStr = dateTimeObj.strftime("%Y-%m-%d")
+    if not COL_TELEMETRY.document(timestampStr).get().exists:
+        try:
+            COL_TELEMETRY.document(timestampStr).set({"Date": timestampStr})
+            for sensor in SENSORS:
+                COL_TELEMETRY.document(timestampStr).collection(sensor).document("0").set({})
+            return "Documents Created", 201
+        except Exception as e:
+            return f"An Error Occured: {e}", 400
+    return "Document already exists", 200
+
+
+@app.route('/car', methods=['POST'])
+def fromCar():
+    auth = request.headers['Authentication']
+    if auth != headerKey["Authentication"]:
+        return f"An Error Occured: Authentication Failed", 401
+    global countdownToBufferClear
+    if countdownToBufferClear.is_alive():
+        countdownToBufferClear.cancel()
+        countdownToBufferClear = Timer(60.0, writeToFireBase)
+    countdownToBufferClear.start()
+    now = datetime.now()
+    req_body = request.get_json()
+    nowInSeconds = round((now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds())
+    if not COL_TELEMETRY.document(timestampStr).get().exists:
+        create()
+    collections = COL_TELEMETRY.document(timestampStr).collections()
+    try:
+        buffer[nowInSeconds] = {}
+        for col, sensor in zip(collections, SENSORS):
+            if sensor in req_body.keys():
+                buffer[nowInSeconds][sensor] = req_body[sensor]
+                lastRead[sensor] = req_body[sensor]
+        if len(buffer) > (15*12) : #check buffer size and if it is greater than threshold
+            writeToFireBase()
+            countdownToBufferClear.cancel()
+            buffer.clear()
+            return "Success, buffer limit reached but data uploaded, buffer cleared", 202
+        return "Success, data added to buffer", 202
+    except Exception as e:
+        countdownToBufferClear.cancel()
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print(exc_type, fname, exc_tb.tb_lineno)
+        return f"An Error Occured: {e}", 400
+
+
+@app.route('/get/<date>', methods=['GET'])
+def read(date):
+    """
+        read() : Fetches documents from Firestore collection as JSON
+        todo : Return document that matches query ID
+        all_todos : Return all documents
+    """
+    # dateFormat = "%Y-%m-%d"
+    try:
+        if not COL_TELEMETRY.document(date).get().exists:
+            return "Document for specified date does not exist", 404
+        data = dict()
+        collections = COL_TELEMETRY.document(date).collections()
+        for col in collections:
+            for doc in col.stream():
+                data[str(col.id)] = doc.to_dict()
+        return jsonify(data), 200
+    except Exception as e:
+        return f"An Error Occured: {e}", 404
+
+@app.route("/recent", methods=["GET"])
+def recentData():
+    """
+    Return the most recent data set that was sent from the car
+    """
+    try:
+        data = dict()
+        for sensor in lastRead.keys():
+            data[sensor] = lastRead[sensor]            
+        return jsonify(data), 200
+    except Exception as e:
+        return f"An Error Occured: {e}", 404
 
 @app.route('/', methods=['GET'])
 def index():
@@ -248,4 +367,4 @@ def data():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True, port=8080)
