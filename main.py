@@ -4,9 +4,9 @@ import json
 from collections import OrderedDict
 from threading import Timer
 from datetime import datetime, timedelta, date
-import time
+from time import time
 import sys
-from random import randint  # For generating test data
+from random import randint, choices  # For generating test data
 
 import firebase_admin
 import numpy as np  # For downsampling
@@ -154,7 +154,7 @@ def recentData():
     try:
         data = dict()
         for sensor in lastRead.keys():
-            data[sensor] = lastRead[sensor]            
+            data[sensor] = lastRead[sensor]
         return jsonify(data), 200
     except Exception as e:
         return f"An Error Occured: {e}", 404
