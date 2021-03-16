@@ -28,7 +28,7 @@ db = firestore.client()
 
 app = Flask(__name__, static_url_path='/static')
 
-NAV_LIST = ["Daily", "Realtime", "Longterm"]
+NAV_LIST = ["Realtime", "Daily", "Longterm"]
 
 
 # Determines what each tab/graph should display
