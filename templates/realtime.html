@@ -9,22 +9,38 @@
         <h1 class="text-center">Realtime</h1>
     </div>
     <div class="container">
+    <div class="row">
+
+        <!-- Top row for map
         <div class="row">
-            <div class="col-6" style="min-width: 500px; margin: auto">
-                <div style="width:100%; height: 100%">
-		            <canvas id="canvas"></canvas>
-                </div>
-            <br>
-            <br>
-            </div>
-
-            <div class="col-6" style="min-width: 500px; margin: auto">
-                <h1>Right col</h1>
-            </div>
-
+            <div id="map"></div>
         </div>
+        -->
+
+
+        {% for datatype, datatype_dic in format.items() %}
+            <div class="col-12 col-lg-6 m-0 p-1" style="min-height: 500px;">
+                <div id="card-{{ datatype }}" class="card m-1" style="height: 100%; width: 100%">
+                        <div id="head-{{ datatype }}" class="card-header">
+                            {{ datatype_dic['name'] }}: x
+                        </div>
+
+                        <div class="card-body p-0">
+                            <canvas id="canvas-{{ datatype }}" class="can" style="height: 100%; width: 100%"></canvas>
+                        </div>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
     </div>
 
     <script src="{{ url_for('static', filename='javascript/realtime.js') }}"></script>
+
+    <!-- Map script has to come down here-->
+    <script src="{{ url_for("static", filename="javascript/realtime_map.js") }}"></script>
+
+    <!-- Initialize map, injecting URL containing API token -->
+    <script src="{{ maps_url }}"></script>
 	</body>
 {% endblock %}
