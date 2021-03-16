@@ -80,7 +80,7 @@ function checkForData() {
                     let parsed_id = chart.canvas.id.split("-")[1];
                     if(parsed_id === key) {
                         //pushData(chart, 1000*parseInt(data["gps_time"]), parseInt(data[key]));
-                        updateChart(chart, [parseInt(data["gps_time"])], [parseInt(data[key])]);
+                        updateChart(chart, [1000*parseInt(data["gps_time"])], [parseInt(data[key])]);
                     }
                 }
             }
