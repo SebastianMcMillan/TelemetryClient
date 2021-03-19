@@ -70,6 +70,7 @@ def writeToFireBase():
         print(exc_type, fname, exc_tb.tb_lineno)
         print(e)
 
+countdownToBufferClear = Timer(60.0, writeToFireBase)
 
 def create():
     """
@@ -96,10 +97,8 @@ def fromCar():
     if auth != headerKey["Authentication"]:
         return f"An Error Occured: Authentication Failed", 401
     global countdownToBufferClear
-    if countdownToBufferClear.is_alive():
-        countdownToBufferClear.cancel()
-        countdownToBufferClear = Timer(60.0, writeToFireBase)
-    countdownToBufferClear.start()
+    if countdownToBufferClear.is_alive() == False:
+        countdownToBufferClear.start()
     now = datetime.now()
     req_body = request.get_json()
     nowInSeconds = round((now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds())
