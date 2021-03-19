@@ -20,9 +20,14 @@
         {% for datatype, datatype_dic in format.items() %}
             <div class="col-12 col-lg-6 m-0 p-1" style="min-height: 500px;">
                 <div id="card-{{ datatype }}" class="card m-1" style="height: 100%; width: 100%">
-                        <div id="head-{{ datatype }}" class="card-header">
-                            {{ datatype_dic['name'] }}: x
+                        <div class="card-header">
+                            {{ datatype_dic['name']}}
+                            <span id="head-{{ datatype }}">
+
+                            </span>
+                            {{datatype_dic['unit'] }}
                         </div>
+
 
                         <div class="card-body p-0">
                             <canvas id="canvas-{{ datatype }}" class="can" style="height: 100%; width: 100%"></canvas>
@@ -37,7 +42,7 @@
     <script src="{{ url_for('static', filename='javascript/realtime.js') }}"></script>
 
     <!-- Map script has to come down here-->
-    <script src="{{ url_for("static", filename="javascript/realtime_map.js") }}"></script>
+    <script src="{{ url_for('static', filename='javascript/realtime_map.js') }}"></script>
 
     <!-- Initialize map, injecting URL containing API token -->
     <script src="{{ maps_url }}"></script>

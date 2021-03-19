@@ -121,5 +121,4 @@ function updateHead(chart) {
     let head_key = "head-" + data_key;
 
     let header = document.getElementById(head_key);
-	header.innerText = header.innerText.split(':')[0] +  ": " + latest_val;
 }
