@@ -11,11 +11,34 @@ window.chartColors = {
 
 let color = Chart.helpers.color;
 
-/*
-Canvases hold contexts. Charts are created by passing a context and a config dict.
- */
+// Don't make graphs for the data with these JSON keys.
+IGNORED_KEYS = ["gps_time",
+                "gps_lat",
+                "gps_lon",
+                "gps_velocity_east",
+                "gps_velocity_north",
+                "gps_velocity_up"];
+
+// First, remove from the page charts we don't want, according to the keys above.
+let card_containers = document.getElementsByClassName("card-container");
+console.log(card_containers.length);
+for(let i=0; i < card_containers.length-1; i++) {
+    let con = card_containers[i];
+    let con_id = con.id.split("-")[1];
+    console.log(con_id, " is satisfied: ", IGNORED_KEYS.includes(con_id));
+
+    if (IGNORED_KEYS.includes(con_id)) {
+        card_containers[i].parentNode.removeChild(con);
+    }
+}
+card_containers = document.getElementsByClassName("card-container");
+console.log(card_containers.length);
+
+// Canvases hold contexts. Charts are created by passing a context and a config dict.
 let canvases = Array.from(document.getElementsByClassName("can"));
-let contexts = canvases.map(x => x.getContext('2d'));
+let contexts = canvases.map(x => {
+    return x.getContext('2d')
+});
 let charts = contexts.map(x => new Chart(x, {
     type: 'line',
     data: {
@@ -69,7 +92,7 @@ Requests new data and calls updateChart() with it.
  */
 function checkForData() {
     const http = new XMLHttpRequest();
-    const url = "http://127.0.0.1:5000/realtime/data";
+    const url = "/realtime/data";
     http.open("GET", url);
     http.send();
 
@@ -96,7 +119,6 @@ Updates chart with values with paired values from time_queue, new_data_queue
 function updateChart(chart, time_queue, new_data_queue) {
 	let data = chart.config.data.datasets[0].data;
 	for (let i=0; i < new_data_queue.length; i++) {
-	    console.log("length is ", new_data_queue.length);
 		if(data.length > 5) {
 			data.splice(0, 1);
 		}
