@@ -24,7 +24,7 @@
 						  <div class="d-flex align-items-center">
 						  {% for nav_link in nav_list %}
 
-                        	<li class="nav-item{% if nav_link == nav %} active{% endif %}">
+                        	<li class="text-capitalize nav-item{% if nav_link == nav %} active{% endif %}">
 							<a class="nav-link" href="{{ url_for(nav_link.lower()) }}">{{nav_link}}</a>
 
 						  </li>
