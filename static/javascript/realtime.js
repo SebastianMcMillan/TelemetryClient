@@ -20,19 +20,16 @@ IGNORED_KEYS = ["gps_time",
                 "gps_velocity_up"];
 
 // First, remove from the page charts we don't want, according to the keys above.
-let card_containers = document.getElementsByClassName("card-container");
-console.log(card_containers.length);
+let card_containers = document.querySelectorAll(".card-container");
 for(let i=0; i < card_containers.length-1; i++) {
     let con = card_containers[i];
     let con_id = con.id.split("-")[1];
-    console.log(con_id, " is satisfied: ", IGNORED_KEYS.includes(con_id));
 
     if (IGNORED_KEYS.includes(con_id)) {
         card_containers[i].parentNode.removeChild(con);
     }
 }
-card_containers = document.getElementsByClassName("card-container");
-console.log(card_containers.length);
+
 
 // Canvases hold contexts. Charts are created by passing a context and a config dict.
 let canvases = Array.from(document.getElementsByClassName("can"));
