@@ -120,6 +120,7 @@ function updateHead(chart) {
     let data_key = chart.canvas.id.split("-")[1];
     let head_key = "head-" + data_key;
     let header = document.getElementById(head_key);
-        header.innerText = header.innerText.split(':')[0] +  ": " + latest_val;
+    header.innerText = latest_val;
+
 
 }
