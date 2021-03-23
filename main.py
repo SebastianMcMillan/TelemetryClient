@@ -39,7 +39,7 @@ app = Flask(__name__, static_url_path='/static')
 SENSORS = ["battery_current", "battery_temperature", "battery_voltage", "bms_fault", "gps_lat","gps_lon", "gps_speed", "gps_time",
 "gps_velocity_east", "gps_velocity_north", "gps_velocity_up", "motor_speed", "solar_current", "solar_voltage"]
 
-NAV_LIST = ["Realtime", "Daily", "Longterm"]
+NAV_LIST = ["realtime", "daily", "longterm"]
 
 # Determines what each tab/graph should display
 with open(CLIENT_FORMAT_FILE) as file_handle:
