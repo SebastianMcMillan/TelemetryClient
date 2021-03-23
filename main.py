@@ -70,6 +70,7 @@ def writeToFireBase():
         print(exc_type, fname, exc_tb.tb_lineno)
         print(e)
 
+countdownToBufferClear = Timer(60.0, writeToFireBase)
 
 def create():
     """
@@ -96,10 +97,9 @@ def fromCar():
     if auth != headerKey["Authentication"]:
         return f"An Error Occured: Authentication Failed", 401
     global countdownToBufferClear
-    if countdownToBufferClear.is_alive():
-        countdownToBufferClear.cancel()
+    if countdownToBufferClear.is_alive() == False:
         countdownToBufferClear = Timer(60.0, writeToFireBase)
-    countdownToBufferClear.start()
+        countdownToBufferClear.start()
     now = datetime.now()
     req_body = request.get_json()
     nowInSeconds = round((now - now.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds())
@@ -114,12 +114,14 @@ def fromCar():
                 lastRead[sensor] = req_body[sensor]
         if len(buffer) > (15*12) : #check buffer size and if it is greater than threshold
             writeToFireBase()
-            countdownToBufferClear.cancel()
+            countdownToBufferClear._stop()
+            countdownToBufferClear._delete()
             buffer.clear()
             return "Success, buffer limit reached but data uploaded, buffer cleared", 202
         return "Success, data added to buffer", 202
     except Exception as e:
-        countdownToBufferClear.cancel()
+        countdownToBufferClear._stop()
+        countdownToBufferClear._delete()
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         print(exc_type, fname, exc_tb.tb_lineno)
