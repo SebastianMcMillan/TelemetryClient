@@ -35,6 +35,9 @@
     </div>
     </div>
 
+    <script>
+        let db_format = {{ format | tojson }};
+    </script>
     <script src="{{ url_for('static', filename='javascript/realtime.js') }}"></script>
 
     <!-- Map script has to come down here-->

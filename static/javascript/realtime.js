@@ -75,6 +75,8 @@ let charts = contexts.map(x => new Chart(x, {
                 },
                 ticks: {
                     beginAtZero: true,
+                    min: 0,
+                    suggestedMax: 10
                 }
             }]
         }
@@ -132,7 +134,9 @@ function updateChart(chart, time_queue, new_data_queue) {
 
 
 /*
-Update text at card head with the latest received value. Called from updateChart().
+Update text at card head with the latest received value.
+Update head background color to red if the value is dangerous.
+Called from updateChart().
  */
 function updateHead(chart) {
     let latest_val = chart.config.data.datasets[0].data[chart.config.data.datasets[0].data.length-1].y;
@@ -141,4 +145,16 @@ function updateHead(chart) {
 
     let header = document.getElementById(head_key);
 	header.innerText = header.innerText.split(':')[0] +  ": " + latest_val;
+
+	if(latest_val > db_format[data_key]["safe_max"] || latest_val < db_format[data_key]["safe_min"]) {
+	    if(!header.classList.contains("bg-danger")) {
+	        header.classList.add("bg-danger");
+            header.classList.add("text-white");
+        }
+    } else {
+	    if(header.classList.contains("bg-danger")) {
+	        header.classList.remove("bg-danger");
+            header.classList.remove("text-white");
+        }
+    }
 }

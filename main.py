@@ -146,6 +146,7 @@ def read(date):
     except Exception as e:
         return f"An Error Occured: {e}", 404
 
+
 @app.route("/recent", methods=["GET"])
 def recentData():
     """
@@ -158,6 +159,7 @@ def recentData():
         return jsonify(data), 200
     except Exception as e:
         return f"An Error Occured: {e}", 404
+
 
 @app.route('/', methods=['GET'])
 def index():
@@ -341,11 +343,6 @@ def dummy():
         #print(dummy_data)
 
     return "OK"
-
-
-@app.route('/realtime/give-bool', methods=['GET'])
-def give_bool():
-    return str(randint(0, 1))
 
 
 @app.route('/realtime/data', methods=['GET'])
