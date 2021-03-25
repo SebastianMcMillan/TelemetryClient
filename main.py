@@ -345,7 +345,7 @@ def dummy():
     return "OK"
 
 
-@app.route('/realtime/data', methods=['GET'])
+@app.route('/realtime/data1', methods=['GET'])
 def data():
     return jsonify(battery_voltage=randint(0, 5),
                    battery_current=randint(15, 30),

@@ -1,6 +1,8 @@
 {% extends "layout.html" %}
 {% block head %}
 	{{ super() }}
+    <script src="node_modules/gridstack/dist/gridstack-h5.js"></script>
+    <link href="node_modules/gridstack/dist/gridstack.min.css" rel="stylesheet"/>
 {% endblock %}
 {% block body %}
 	<body>
@@ -23,6 +25,7 @@
                 <div id="card-{{ datatype }}" class="card m-1" style="height: 100%; width: 100%">
                         <div id="head-{{ datatype }}" class="card-header">
                             {{ datatype_dic['name'] }}: x
+                            <p style="float: right; margin: 0">Pin</p>
                         </div>
 
                         <div class="card-body p-0">
