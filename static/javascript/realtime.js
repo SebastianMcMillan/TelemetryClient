@@ -145,15 +145,17 @@ function updateHead(chart) {
     let header = document.getElementById(head_key);
     header.innerText = latest_val;
 
+    let card_header = header.parentNode;
+
 	if(latest_val > db_format[data_key]["safe_max"] || latest_val < db_format[data_key]["safe_min"]) {
-	    if(!header.classList.contains("bg-danger")) {
-	        header.classList.add("bg-danger");
-            header.classList.add("text-white");
+	    if(!card_header.classList.contains("bg-danger")) {
+	        card_header.classList.add("bg-danger");
+            card_header.classList.add("text-white");
         }
     } else {
-	    if(header.classList.contains("bg-danger")) {
-	        header.classList.remove("bg-danger");
-            header.classList.remove("text-white");
+	    if(card_header.classList.contains("bg-danger")) {
+	        card_header.classList.remove("bg-danger");
+            card_header.classList.remove("text-white");
         }
     }
 }
