@@ -91,7 +91,7 @@ Requests new data and calls updateChart() with it.
  */
 function checkForData() {
     const http = new XMLHttpRequest();
-    const url = "/realtime/data";
+    const url = "/realtime/data1";
     http.open("GET", url);
     http.send();
 
