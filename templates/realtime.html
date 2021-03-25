@@ -6,7 +6,6 @@
 {% endblock %}
 {% block body %}
 	<body>
-    <div id="bg"></div>
     <div id="top">
         <h1 class="text-center">Realtime</h1>
     </div>
@@ -23,9 +22,12 @@
         {% for datatype, datatype_dic in format.items() %}
             <div id="container-{{ datatype }}" class="card-container col-12 col-lg-6 m-0 p-1" style="min-height: 500px;">
                 <div id="card-{{ datatype }}" class="card m-1" style="height: 100%; width: 100%">
-                        <div id="head-{{ datatype }}" class="card-header">
-                            {{ datatype_dic['name'] }}: x
-                            <p style="float: right; margin: 0">Pin</p>
+                        <div class="card-header">
+                            {{ datatype_dic['name'] }}:
+                            <span id="head-{{datatype}}">
+
+                            </span>
+                            {{datatype_dic['unit'] }}
                         </div>
 
                         <div class="card-body p-0">
@@ -44,7 +46,7 @@
     <script src="{{ url_for('static', filename='javascript/realtime.js') }}"></script>
 
     <!-- Map script has to come down here-->
-    <script src="{{ url_for("static", filename="javascript/realtime_map.js") }}"></script>
+    <script src="{{ url_for('static', filename='javascript/realtime_map.js') }}"></script>
 
     <!-- Initialize map, injecting URL containing API token -->
     <script src="{{ maps_url }}"></script>
