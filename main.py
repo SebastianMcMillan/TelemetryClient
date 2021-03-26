@@ -350,20 +350,12 @@ def give_bool():
 
 @app.route('/realtime/data', methods=['GET'])
 def data():
-    return jsonify(battery_voltage=randint(0, 5),
-                   battery_current=randint(15, 30),
-                   battery_temperature=randint(80, 120),
-                   bms_fault=choices([0, 1], weights=[.9, .1])[0],
-                   gps_time=int(time()),  # seconds since epoch
-                   gps_lat=None,
-                   gps_lon=None,
-                   gps_velocity_east=None,
-                   gps_velocity_north=None,
-                   gps_velocity_up=None,
-                   gps_speed=None,
-                   solar_voltage=randint(0, 5),
-                   solar_current=randint(15, 30),
-                   motor_speed=randint(15, 30))
+    data = dict()
+    for sensor in lastRead.keys():
+        data[sensor] = lastRead[sensor]
+    data["gps_time"] = int(time())  
+
+    return jsonify(data), 200
 
 
 if __name__ == '__main__':
