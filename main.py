@@ -172,7 +172,20 @@ def index():
 def realtime():
     nav_list = NAV_LIST
     nav = "realtime"
-    return render_template('realtime.html', nav_list=nav_list, nav=nav, maps_url=key, format=db_format)
+    no_chart_keys = {  # Some info never needs to be graphed. Pass it as dict for JSON serialization.
+        'keys': ["gps_time",
+                 "gps_lon",
+                 "gps_lat",
+                 "gps_velocity_east",
+                 "gps_velocity_north",
+                 "gps_velocity_up"]}
+
+    return render_template('realtime.html',
+                           nav_list=nav_list,
+                           nav=nav,
+                           maps_url=key,
+                           format=db_format,
+                           no_chart=no_chart_keys)
 
 
 @app.route('/daily', methods=['GET'])

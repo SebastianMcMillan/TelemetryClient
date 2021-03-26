@@ -11,23 +11,56 @@ window.chartColors = {
 
 let color = Chart.helpers.color;
 
-// Don't make graphs for the data with these JSON keys.
-IGNORED_KEYS = ["gps_time",
-                "gps_lat",
-                "gps_lon",
-                "gps_velocity_east",
-                "gps_velocity_north",
-                "gps_velocity_up"];
+function applyFilter(ignored_keys) {
+    let card_containers = document.querySelectorAll(".card-container");
+    for(let i=0; i < card_containers.length; i++) {
+        let con = card_containers[i];
+        let con_id = con.id.split("-")[1];
 
-// First, remove from the page charts we don't want, according to the keys above.
-let card_containers = document.querySelectorAll(".card-container");
-for(let i=0; i < card_containers.length-1; i++) {
-    let con = card_containers[i];
-    let con_id = con.id.split("-")[1];
-
-    if (IGNORED_KEYS.includes(con_id)) {
-        card_containers[i].parentNode.removeChild(con);
+        if (ignored_keys.includes(con_id)) {
+            card_containers[i].style.display = 'none';
+        } else {
+            card_containers[i].style.display = 'block';
+        }
     }
+}
+
+/*
+Add the chart to the chart-restoration select.
+Hide the chart.
+Ensure sel is shown; it could have been hidden if no charts were hidden.
+ */
+function hideChart(id) {
+    let opt = document.createElement('option');
+    let sel = document.getElementById('add-chart-sel');
+    opt.id = 'opt-' + id;
+    opt.value = id;
+    opt.innerHTML = db_format[id]['name'];
+    sel.appendChild(opt);
+
+    sel.parentNode.style.display = 'block';
+
+    document.getElementById('container-' + id).style.display = 'none';
+}
+
+/*
+Remove the chart-option from the chart restoration selection.
+Reset the selection value to the default option.
+If no hidden charts hide sel.
+Show the chart.
+ */
+function showChart(id) {
+    let removed_opt = document.getElementById('opt-' + id);
+    let sel = removed_opt.parentNode;
+    sel.removeChild(removed_opt);
+
+    sel.value = "def";  // "Add a chart" option.
+
+    if(sel.childNodes.length === 3) {
+        sel.parentNode.style.display = 'none';
+    }
+
+    document.getElementById('container-' + id).style.display = 'block';
 }
 
 
