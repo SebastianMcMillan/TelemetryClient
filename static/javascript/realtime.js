@@ -165,16 +165,7 @@ function updateHead(chart) {
     header.innerText = latest_val;
 
     let card_header = header.parentNode;
-
-	if(latest_val > db_format[data_key]["safe_max"] || latest_val < db_format[data_key]["safe_min"]) {
-	    if(!card_header.classList.contains("bg-danger")) {
-	        card_header.classList.add("bg-danger");
-            card_header.classList.add("text-white");
-        }
-    } else {
-	    if(card_header.classList.contains("bg-danger")) {
-	        card_header.classList.remove("bg-danger");
-            card_header.classList.remove("text-white");
-        }
-    }
+    let unsafe_val = latest_val > db_format[data_key]["safe_max"] || latest_val < db_format[data_key]["safe_min"];
+    card_header.classList.toggle('bg-danger', unsafe_val);
+    card_header.classList.toggle('text-white', unsafe_val);
 }
