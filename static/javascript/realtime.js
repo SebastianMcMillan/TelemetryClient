@@ -110,7 +110,7 @@ Requests new data and calls updateChart() with it.
  */
 function checkForData() {
     const http = new XMLHttpRequest();
-    const url = "/realtime/data1";
+    const url = "/realtime/data";
     http.open("GET", url);
     http.send();
 
