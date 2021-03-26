@@ -11,20 +11,6 @@ window.chartColors = {
 
 let color = Chart.helpers.color;
 
-function applyFilter(ignored_keys) {
-    let card_containers = document.querySelectorAll(".card-container");
-    for(let i=0; i < card_containers.length; i++) {
-        let con = card_containers[i];
-        let con_id = con.id.split("-")[1];
-
-        if (ignored_keys.includes(con_id)) {
-            card_containers[i].style.display = 'none';
-        } else {
-            card_containers[i].style.display = 'block';
-        }
-    }
-}
-
 /*
 Add the chart to the chart-restoration select.
 Hide the chart.
