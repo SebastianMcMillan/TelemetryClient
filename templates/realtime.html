@@ -29,9 +29,9 @@
 
 
         {% for datatype, datatype_dic in format.items() if datatype not in no_chart['keys'] %}
-            <div id="container-{{ datatype }}" class="card-container col-12 col-lg-6 m-0 p-1" style="min-height: 500px;">
-                <div id="card-{{ datatype }}" class="card m-1" style="height: 100%; width: 100%">
-                    <div class="card-header">
+            <div id="container-{{ datatype }}" class="card-container col-12 col-lg-6 m-0 p-1">
+                <div id="card-{{ datatype }}" class="card m-1">
+                    <div class="card-header" data-toggle="collapse" data-target="#card-body-wrap-{{ datatype }}">
                         <p style="float: left; margin: 0" onclick="hideChart('{{ datatype }}')">Hide</p>
 
                         {{ datatype_dic['name'] }}:
@@ -43,8 +43,10 @@
                         <p style="float: right; margin: 0">Pin</p>
                     </div>
 
-                    <div class="card-body p-0">
-                        <canvas id="canvas-{{ datatype }}" class="can" style="height: 100%; width: 100%"></canvas>
+                    <div id="card-body-wrap-{{ datatype }}" class="h-100 collapse show" style="-webkit-transition: height 0.01s;-moz-transition: height 0.01s;-o-transition: height 0.01s;transition: height 0.01s;">
+                        <div class="card-body p-0">
+                            <canvas id="canvas-{{ datatype }}" class="can" style="height: 600px;"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
