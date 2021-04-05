@@ -35,6 +35,7 @@ Reset the selection value to the default option.
 If no hidden charts hide sel.
 Show the chart.
  */
+
 function showChart(id) {
     let removed_opt = document.getElementById('opt-' + id);
     let sel = removed_opt.parentNode;
@@ -47,6 +48,8 @@ function showChart(id) {
     }
 
     document.getElementById('container-' + id).style.display = 'block';
+
+    $('#card-body-wrap-' + id).collapse('show')
 }
 
 
